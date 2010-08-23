@@ -1,3 +1,6 @@
 ﻿* write some tests for the code currently residing in Go
 * write some integration test scenarios
 * write some more bullets on this todo
+* add ability to run user-supplied instance of ICommando
+* add ability to generate generic help text for each parameter
+* add ability for user to supply additional and/or custom help text

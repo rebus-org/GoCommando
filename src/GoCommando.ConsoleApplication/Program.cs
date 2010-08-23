@@ -1,11 +1,13 @@
 ﻿using System;
+using GoCommando.Api;
+using GoCommando.Attributes;
 
 namespace GoCommando.ConsoleApplication
 {
     [Banner(@"This is a sample command line app
 
 (c) Some Dude 2010")]
-    class Program : IGoCommando
+    class Program : ICommando
     {
         [PositionalArgument(0)]
         public string Path { get; set; }

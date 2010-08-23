@@ -2,19 +2,32 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using GoCommando.Api;
+using GoCommando.Attributes;
+using GoCommando.Parameters;
 
 namespace GoCommando
 {
     public static class Go
     {
-        public static int Run<TGoCommando>(string[] args) where TGoCommando : IGoCommando
+        /// <summary>
+        /// Runs the specified type, GoCommando style. What this means is that:
+        ///     * if type is decorated with [Banner(...)], that banner will be output
+        ///     * args will be bound to public properties decorated with [PositionalArgument] and [NamedArgument]
+        ///     * validation (if any) will be run
+        ///     * help text will be shown where appropriate
+        /// </summary>
+        public static int Run<TCommando>(string[] args) where TCommando : ICommando
         {
             try
             {
-                PossiblyShowBanner(typeof(TGoCommando));
-                var instance = (IGoCommando)Activator.CreateInstance(typeof(TGoCommando));
+                PossiblyShowBanner(typeof(TCommando));
+                
+                var instance = (ICommando) Activator.CreateInstance(typeof (TCommando));
                 PopulateInstanceParameters(instance, args);
+                
                 instance.Run();
+
                 return 0;
             }
             catch (CommandoException e)
@@ -41,7 +54,7 @@ namespace GoCommando
             Write(attribute.Text);
         }
 
-        static void PopulateInstanceParameters(IGoCommando commando, string[] args)
+        static void PopulateInstanceParameters(ICommando commando, string[] args)
         {
             var parser = new ArgParser();
             var parameters = parser.Parse(args);
@@ -52,7 +65,7 @@ namespace GoCommando
             }
         }
 
-        static void Bind(IGoCommando commando, PropertyInfo property, List<CommandLineParameter> parameters, ArgumentAttribute attribute)
+        static void Bind(ICommando commando, PropertyInfo property, List<CommandLineParameter> parameters, ArgumentAttribute attribute)
         {
             if(attribute is PositionalArgumentAttribute)
             {
@@ -68,7 +81,7 @@ namespace GoCommando
             }
         }
 
-        static void BindNamed(IGoCommando commando, PropertyInfo property, List<CommandLineParameter> parameters, NamedArgumentAttribute attribute)
+        static void BindNamed(ICommando commando, PropertyInfo property, List<CommandLineParameter> parameters, NamedArgumentAttribute attribute)
         {
             var name = attribute.Name;
             var shortHand = attribute.ShortHand;
@@ -84,7 +97,7 @@ namespace GoCommando
             property.SetValue(commando, Convert.ChangeType(parameter.Value, property.PropertyType), null);
         }
 
-        static void BindPositional(IGoCommando commando, PropertyInfo property, List<CommandLineParameter> parameters, PositionalArgumentAttribute attribute)
+        static void BindPositional(ICommando commando, PropertyInfo property, List<CommandLineParameter> parameters, PositionalArgumentAttribute attribute)
         {
             var position = attribute.Index;
             var parameter = parameters

@@ -46,18 +46,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgParser.cs" />
-    <Compile Include="ArgumentAttribute.cs" />
+    <Compile Include="Attributes\ArgumentAttribute.cs" />
     <Compile Include="AttributeExtensions.cs" />
-    <Compile Include="BannerAttribute.cs" />
-    <Compile Include="CommandLineParameter.cs" />
+    <Compile Include="Attributes\BannerAttribute.cs" />
+    <Compile Include="Parameters\CommandLineParameter.cs" />
     <Compile Include="CommandoException.cs" />
     <Compile Include="Go.cs" />
-    <Compile Include="IGoCommando.cs" />
-    <Compile Include="NamedArgumentAttribute.cs" />
-    <Compile Include="NamedCommandLineParameter.cs" />
-    <Compile Include="NamedFlagCommandLineParameter.cs" />
-    <Compile Include="PositionalArgumentAttribute.cs" />
-    <Compile Include="PositionalCommandLineParameter.cs" />
+    <Compile Include="Api\ICommando.cs" />
+    <Compile Include="Attributes\NamedArgumentAttribute.cs" />
+    <Compile Include="Parameters\NamedCommandLineParameter.cs" />
+    <Compile Include="Attributes\PositionalArgumentAttribute.cs" />
+    <Compile Include="Parameters\PositionalCommandLineParameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
