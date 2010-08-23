@@ -31,8 +31,9 @@ namespace GoCommando.Tests
         [Test]
         public void DoesNotThrowIfItsAFlag()
         {
-            var parameter = parser.Parse(new[]{"/param"}).Cast<NamedFlagCommandLineParameter>().Single();
-            Assert.AreEqual("param", parameter.Value);
+            var parameter = parser.Parse(new[]{"/param"}).Cast<NamedCommandLineParameter>().Single();
+            Assert.AreEqual("param", parameter.Name);
+            Assert.AreEqual("True", parameter.Value);
         }
 
         [Test]

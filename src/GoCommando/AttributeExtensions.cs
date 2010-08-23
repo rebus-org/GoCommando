@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace GoCommando
 {
@@ -13,10 +14,15 @@ namespace GoCommando
                 .ForEach(handleAttribute);
         }
 
-        public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this Type type)
+        public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this ICustomAttributeProvider type)
         {
             return type.GetCustomAttributes(typeof (TAttribute), false)
                 .Cast<TAttribute>();
+        }
+
+        public static bool HasAttribute<TAttribute>(this ICustomAttributeProvider customAttributeProvider)
+        {
+            return GetAttributes<TAttribute>(customAttributeProvider).Any();
         }
     }
 }

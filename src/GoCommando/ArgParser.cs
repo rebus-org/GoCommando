@@ -55,7 +55,7 @@ namespace GoCommando
 
             if (tokens.Length == 1)
             {
-                return new NamedFlagCommandLineParameter(tokens.Single());
+                return new NamedCommandLineParameter(tokens.Single(), "True");
             }
 
             return new NamedCommandLineParameter(tokens.First(), string.Join("", tokens.Skip(1).ToArray()));

@@ -1,6 +1,6 @@
 namespace GoCommando
 {
-    class NamedCommandLineParameter : CommandLineParameter
+    public class NamedCommandLineParameter : CommandLineParameter
     {
         public NamedCommandLineParameter(string name, string value) : base(value)
         {
@@ -8,5 +8,10 @@ namespace GoCommando
         }
 
         public string Name { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("/{0}:{1}", Name, Value);
+        }
     }
 }

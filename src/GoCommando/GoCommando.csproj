@@ -51,7 +51,7 @@
     <Compile Include="BannerAttribute.cs" />
     <Compile Include="CommandLineParameter.cs" />
     <Compile Include="CommandoException.cs" />
-    <Compile Include="GoCommando.cs" />
+    <Compile Include="Go.cs" />
     <Compile Include="IGoCommando.cs" />
     <Compile Include="NamedArgumentAttribute.cs" />
     <Compile Include="NamedCommandLineParameter.cs" />

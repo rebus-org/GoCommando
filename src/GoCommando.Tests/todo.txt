@@ -1,0 +1,3 @@
+﻿* write some tests for the code currently residing in Go
+* write some integration test scenarios
+* write some more bullets on this todo
