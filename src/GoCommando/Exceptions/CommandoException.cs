@@ -1,6 +1,6 @@
 using System;
 
-namespace GoCommando
+namespace GoCommando.Exceptions
 {
     public class CommandoException : ApplicationException
     {

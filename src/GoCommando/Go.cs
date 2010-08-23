@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using GoCommando.Api;
 using GoCommando.Attributes;
+using GoCommando.Exceptions;
+using GoCommando.Extensions;
+using GoCommando.Helpers;
 using GoCommando.Parameters;
 
 namespace GoCommando
@@ -21,12 +22,15 @@ namespace GoCommando
         {
             try
             {
-                PossiblyShowBanner(typeof(TCommando));
-                
-                var instance = (ICommando) Activator.CreateInstance(typeof (TCommando));
-                PopulateInstanceParameters(instance, args);
-                
-                instance.Run();
+                var instance = CreateInstance<TCommando>();
+
+                PossiblyShowBanner(instance);
+
+                var parameters = GetParameters(args);
+
+                PopulateProperties(parameters, instance);
+
+                Execute(instance);
 
                 return 0;
             }
@@ -44,8 +48,15 @@ namespace GoCommando
             }
         }
 
-        static void PossiblyShowBanner(Type type)
+        static ICommando CreateInstance<TCommando>()
         {
+            var factory = new DefaultCommandoFactory();
+            return factory.Create(typeof(TCommando));
+        }
+
+        static void PossiblyShowBanner(object obj)
+        {
+            var type = obj.GetType();
             type.WithAttributes<BannerAttribute>(ShowBanner);
         }
 
@@ -54,74 +65,26 @@ namespace GoCommando
             Write(attribute.Text);
         }
 
-        static void PopulateInstanceParameters(ICommando commando, string[] args)
-        {
-            var parser = new ArgParser();
-            var parameters = parser.Parse(args);
-            
-            foreach(var property in commando.GetType().GetProperties().Where(ShouldBeBound))
-            {
-                Bind(commando, property, parameters, property.GetAttributes<ArgumentAttribute>().Single());
-            }
-        }
-
-        static void Bind(ICommando commando, PropertyInfo property, List<CommandLineParameter> parameters, ArgumentAttribute attribute)
-        {
-            if(attribute is PositionalArgumentAttribute)
-            {
-                BindPositional(commando, property, parameters, (PositionalArgumentAttribute) attribute);
-            }
-            else if (attribute is NamedArgumentAttribute)
-            {
-                BindNamed(commando, property, parameters, (NamedArgumentAttribute) attribute);
-            }
-            else
-            {
-                throw new CommandoException("Don't know the attribute type {0}", attribute.GetType().Name);
-            }
-        }
-
-        static void BindNamed(ICommando commando, PropertyInfo property, List<CommandLineParameter> parameters, NamedArgumentAttribute attribute)
-        {
-            var name = attribute.Name;
-            var shortHand = attribute.ShortHand;
-            var parameter = parameters.Where(p => p is NamedCommandLineParameter)
-                .Cast<NamedCommandLineParameter>()
-                .SingleOrDefault(p => p.Name == name || p.Name == shortHand);
-
-            if (parameter == null)
-            {
-                throw new CommandoException("Could not find parameter matching required positional parameter named {0}", name);
-            }
-
-            property.SetValue(commando, Convert.ChangeType(parameter.Value, property.PropertyType), null);
-        }
-
-        static void BindPositional(ICommando commando, PropertyInfo property, List<CommandLineParameter> parameters, PositionalArgumentAttribute attribute)
-        {
-            var position = attribute.Index;
-            var parameter = parameters
-                .Where(p => p is PositionalCommandLineParameter)
-                .Cast<PositionalCommandLineParameter>()
-                .SingleOrDefault(p => p.Index == position);
-
-            if (parameter == null)
-            {
-                throw new CommandoException(
-                    "Could not find parameter matching required positional parameter at index {0}", position);
-            }
-
-            property.SetValue(commando, Convert.ChangeType(parameter.Value, property.PropertyType), null);
-        }
-
-        static bool ShouldBeBound(PropertyInfo info)
-        {
-            return info.HasAttribute<ArgumentAttribute>();
-        }
-
         static void Write(string text)
         {
             Console.WriteLine(text);
+        }
+
+        static List<CommandLineParameter> GetParameters(string[] args)
+        {
+            var parser = new ArgParser();
+            return parser.Parse(args);
+        }
+
+        static void PopulateProperties(IEnumerable<CommandLineParameter> parameters, ICommando instance)
+        {
+            var binder = new Binder();
+            binder.Bind(instance, parameters);
+        }
+
+        static void Execute(ICommando instance)
+        {
+            instance.Run();
         }
     }
 }

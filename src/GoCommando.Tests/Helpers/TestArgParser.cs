@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Timers;
+using GoCommando.Helpers;
 using GoCommando.Parameters;
 using NUnit.Framework;
 

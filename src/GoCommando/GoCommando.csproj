@@ -45,12 +45,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArgParser.cs" />
     <Compile Include="Attributes\ArgumentAttribute.cs" />
-    <Compile Include="AttributeExtensions.cs" />
     <Compile Include="Attributes\BannerAttribute.cs" />
+    <Compile Include="Exceptions\CommandoException.cs" />
+    <Compile Include="Extensions\AttributeExtensions.cs" />
+    <Compile Include="Helpers\Binder.cs" />
+    <Compile Include="Helpers\DefaultCommandoFactory.cs" />
+    <Compile Include="Helpers\ArgParser.cs" />
     <Compile Include="Parameters\CommandLineParameter.cs" />
-    <Compile Include="CommandoException.cs" />
     <Compile Include="Go.cs" />
     <Compile Include="Api\ICommando.cs" />
     <Compile Include="Attributes\NamedArgumentAttribute.cs" />
