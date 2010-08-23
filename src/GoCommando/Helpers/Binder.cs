@@ -11,11 +11,11 @@ namespace GoCommando.Helpers
 {
     public class Binder
     {
-        public void Bind(object targetWithAttributes, IEnumerable<CommandLineParameter> parametersToBind)
+        public void Bind(object targetObjectWithAttributes, IEnumerable<CommandLineParameter> parametersToBind)
         {
-            foreach (var property in targetWithAttributes.GetType().GetProperties().Where(ShouldBeBound))
+            foreach (var property in targetObjectWithAttributes.GetType().GetProperties().Where(ShouldBeBound))
             {
-                Bind(targetWithAttributes, property, parametersToBind.ToList(),
+                Bind(targetObjectWithAttributes, property, parametersToBind.ToList(),
                      property.GetAttributes<ArgumentAttribute>().Single());
             }
         }
@@ -24,15 +24,15 @@ namespace GoCommando.Helpers
         {
             if (attribute is PositionalArgumentAttribute)
             {
-                BindPositional(commando, property, parameters, (PositionalArgumentAttribute)attribute);
+                BindPositional(commando, property, parameters, (PositionalArgumentAttribute) attribute);
             }
             else if (attribute is NamedArgumentAttribute)
             {
-                BindNamed(commando, property, parameters, (NamedArgumentAttribute)attribute);
+                BindNamed(commando, property, parameters, (NamedArgumentAttribute) attribute);
             }
             else
             {
-                throw new CommandoException("Don't know the attribute type {0}", attribute.GetType().Name);
+                throw Ex("Don't know the attribute type {0}", attribute.GetType().Name);
             }
         }
 
@@ -46,7 +46,9 @@ namespace GoCommando.Helpers
 
             if (parameter == null)
             {
-                throw new CommandoException("Could not find parameter matching required positional parameter named {0}", name);
+                if (!attribute.Required) return;
+
+                throw Ex("Could not find parameter matching required parameter named {0}", name);
             }
 
             property.SetValue(commando, Convert.ChangeType(parameter.Value, property.PropertyType), null);
@@ -62,11 +64,17 @@ namespace GoCommando.Helpers
 
             if (parameter == null)
             {
-                throw new CommandoException(
-                    "Could not find parameter matching required positional parameter at index {0}", position);
+                if (!attribute.Required) return;
+
+                throw Ex("Could not find parameter matching required positional parameter at index {0}", position);
             }
 
             property.SetValue(commando, Convert.ChangeType(parameter.Value, property.PropertyType), null);
+        }
+
+        CommandoException Ex(string message, params object[] objs)
+        {
+            return new CommandoException(message, objs);
         }
 
         bool ShouldBeBound(PropertyInfo info)
