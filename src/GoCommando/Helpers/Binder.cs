@@ -13,18 +13,26 @@ namespace GoCommando.Helpers
     {
         public void Bind(object targetObjectWithAttributes, IEnumerable<CommandLineParameter> parametersToBind)
         {
+            var context = new BindingContext();
             foreach (var property in targetObjectWithAttributes.GetType().GetProperties().Where(ShouldBeBound))
             {
                 Bind(targetObjectWithAttributes, property, parametersToBind.ToList(),
-                     property.GetAttributes<ArgumentAttribute>().Single());
+                     property.GetAttributes<ArgumentAttribute>().Single(),
+                     context);
             }
         }
 
-        void Bind(object commando, PropertyInfo property, List<CommandLineParameter> parameters, ArgumentAttribute attribute)
+        class BindingContext
+        {
+            public int Position { get; set; }
+        }
+
+        void Bind(object commando, PropertyInfo property, List<CommandLineParameter> parameters, ArgumentAttribute attribute, BindingContext context)
         {
             if (attribute is PositionalArgumentAttribute)
             {
-                BindPositional(commando, property, parameters, (PositionalArgumentAttribute) attribute);
+                context.Position++;
+                BindPositional(commando, property, parameters, (PositionalArgumentAttribute) attribute, context.Position);
             }
             else if (attribute is NamedArgumentAttribute)
             {
@@ -54,9 +62,8 @@ namespace GoCommando.Helpers
             property.SetValue(commando, Convert.ChangeType(parameter.Value, property.PropertyType), null);
         }
 
-        void BindPositional(object commando, PropertyInfo property, List<CommandLineParameter> parameters, PositionalArgumentAttribute attribute)
+        void BindPositional(object commando, PropertyInfo property, List<CommandLineParameter> parameters, PositionalArgumentAttribute attribute, int position)
         {
-            var position = attribute.Index;
             var parameter = parameters
                 .Where(p => p is PositionalCommandLineParameter)
                 .Cast<PositionalCommandLineParameter>()

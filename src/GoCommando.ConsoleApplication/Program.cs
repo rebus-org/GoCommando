@@ -9,19 +9,25 @@ namespace GoCommando.ConsoleApplication
 (c) Some Dude 2010")]
     class Program : ICommando
     {
-        [PositionalArgument(0)]
+        [PositionalArgument]
+        [Description("The path to the file you wish to do stuff to")]
         public string Path { get; set; }
 
-        [PositionalArgument(1)]
+        [PositionalArgument]
+        [Description("The value of something")]
         public double Value { get; set; }
 
         [NamedArgument("someflag", "sf")]
+        [Description("Extra-special flag")]
         public bool SomeFlag { get; set; }
 
         [NamedArgument("anotherflag", "af")]
+        [Description("Pretty important flag")]
         public bool AnotherFlag { get; set; }
 
         [NamedArgument("someValue", "sv")]
+        [Description("An integer value specifying something important")]
+        [Example("1"), Example("2"), Example("3")]
         public int SomeValue { get; set; }
 
         [NamedArgument("anotherValue", "av")]
@@ -44,7 +50,8 @@ Another flag: {5} (expected False)",
                    Value,
                               SomeFlag, 
                               SomeValue, 
-                              AnotherValue);
+                              AnotherValue,
+                              AnotherFlag);
         }
     }
 }

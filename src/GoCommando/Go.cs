@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
 using GoCommando.Api;
 using GoCommando.Attributes;
 using GoCommando.Exceptions;
 using GoCommando.Extensions;
 using GoCommando.Helpers;
 using GoCommando.Parameters;
+using Binder=GoCommando.Helpers.Binder;
 
 namespace GoCommando
 {
@@ -25,6 +29,12 @@ namespace GoCommando
                 var instance = CreateInstance<TCommando>();
 
                 PossiblyShowBanner(instance);
+
+                if (ShouldShowHelpText(args))
+                {
+                    ShowHelpText(instance);
+                    return 0;
+                }
 
                 var parameters = GetParameters(args);
 
@@ -48,6 +58,45 @@ namespace GoCommando
             }
         }
 
+        static void ShowHelpText(ICommando commando)
+        {
+            var helper = new Helper();
+            var parameters = helper.GetParameters(commando);
+
+            var exeName = Assembly.GetEntryAssembly().GetName().Name + ".exe";
+            var parameterList = string.Join(" ", parameters.Where(p => p.Position > 0)
+                                                     .Select(p => string.Format("[{0}]", p.Position))
+                                                     .ToArray());
+
+            Write("Usage:");
+            Write();
+            Write("\t{0} {1}", exeName, parameterList);
+
+            Write();
+            Write("Required arguments:");
+            Write();
+
+            foreach(var parameter in parameters.Where(p => p.Position > 0))
+            {
+                Write("\t[{0}] {1}", parameter.Position, parameter.Description);
+            }
+
+            Write();
+            Write("Optional arguments:");
+            Write();
+
+            foreach(var parameter in parameters.Where(p => p.Position == 0))
+            {
+                Write("\t/{0}\t{1}", parameter.Name, parameter.Description);
+            }
+        }
+
+        static bool ShouldShowHelpText(string[] strings)
+        {
+            return strings.Length == 1
+                   && new List<string> {"-h", "--h", "/h", "-?", "/?"}.Contains(strings[0].ToLowerInvariant());
+        }
+
         static ICommando CreateInstance<TCommando>()
         {
             var factory = new DefaultCommandoFactory();
@@ -58,6 +107,7 @@ namespace GoCommando
         {
             var type = obj.GetType();
             type.WithAttributes<BannerAttribute>(ShowBanner);
+            Write();
         }
 
         static void ShowBanner(BannerAttribute attribute)
@@ -65,9 +115,14 @@ namespace GoCommando
             Write(attribute.Text);
         }
 
-        static void Write(string text)
+        static void Write()
         {
-            Console.WriteLine(text);
+            Console.WriteLine();
+        }
+
+        static void Write(string text, params object[] objs)
+        {
+            Console.WriteLine(text, objs);
         }
 
         static List<CommandLineParameter> GetParameters(string[] args)

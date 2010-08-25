@@ -7,17 +7,18 @@ namespace GoCommando.Extensions
 {
     public static class AttributeExtensions
     {
-        public static void WithAttributes<TAttribute>(this Type type, Action<TAttribute> handleAttribute)
+        public static void WithAttributes<TAttribute>(this ICustomAttributeProvider customAttributeProvider, Action<TAttribute> handleAttribute)
         {
-            GetAttributes<TAttribute>(type)
+            GetAttributes<TAttribute>(customAttributeProvider)
                 .ToList()
                 .ForEach(handleAttribute);
         }
 
-        public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this ICustomAttributeProvider type)
+        public static IList<TAttribute> GetAttributes<TAttribute>(this ICustomAttributeProvider customAttributeProvider)
         {
-            return type.GetCustomAttributes(typeof (TAttribute), false)
-                .Cast<TAttribute>();
+            return customAttributeProvider.GetCustomAttributes(typeof (TAttribute), false)
+                .Cast<TAttribute>()
+                .ToList();
         }
 
         public static bool HasAttribute<TAttribute>(this ICustomAttributeProvider customAttributeProvider)

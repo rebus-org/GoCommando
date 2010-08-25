@@ -47,11 +47,14 @@
   <ItemGroup>
     <Compile Include="Attributes\ArgumentAttribute.cs" />
     <Compile Include="Attributes\BannerAttribute.cs" />
+    <Compile Include="Attributes\DescriptionAttribute.cs" />
+    <Compile Include="Attributes\ExampleAttribute.cs" />
     <Compile Include="Exceptions\CommandoException.cs" />
     <Compile Include="Extensions\AttributeExtensions.cs" />
     <Compile Include="Helpers\Binder.cs" />
     <Compile Include="Helpers\DefaultCommandoFactory.cs" />
     <Compile Include="Helpers\ArgParser.cs" />
+    <Compile Include="Helpers\Helper.cs" />
     <Compile Include="Parameters\CommandLineParameter.cs" />
     <Compile Include="Go.cs" />
     <Compile Include="Api\ICommando.cs" />

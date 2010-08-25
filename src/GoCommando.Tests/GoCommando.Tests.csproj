@@ -52,6 +52,7 @@
     <Compile Include="Helpers\TestArgParser.cs" />
     <Compile Include="FixtureBase.cs" />
     <Compile Include="Helpers\TestBinder.cs" />
+    <Compile Include="Helpers\TestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
