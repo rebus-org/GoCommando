@@ -68,26 +68,38 @@ namespace GoCommando
                                                      .Select(p => string.Format("[{0}]", p.Position))
                                                      .ToArray());
 
+            var thereAreRequiredArguments = parameters.Any(p => p.Position > 0);
+            var thereAreOptionalArguments = parameters.Any(p => p.Position == 0);
+
             Write("Usage:");
             Write();
-            Write("\t{0} {1}", exeName, parameterList);
+            Write("\t{0} {1}{2}",
+                  exeName,
+                  parameterList,
+                  thereAreOptionalArguments ? " [...]" : "");
 
-            Write();
-            Write("Required arguments:");
-            Write();
-
-            foreach(var parameter in parameters.Where(p => p.Position > 0))
+            if (thereAreRequiredArguments)
             {
-                Write("\t[{0}] {1}", parameter.Position, parameter.Description);
+                Write();
+                Write("Required arguments:");
+                Write();
+
+                foreach (var parameter in parameters.Where(p => p.Position > 0))
+                {
+                    Write("\t[{0}] {1}", parameter.Position, parameter.Description);
+                }
             }
 
-            Write();
-            Write("Optional arguments:");
-            Write();
-
-            foreach(var parameter in parameters.Where(p => p.Position == 0))
+            if (thereAreOptionalArguments)
             {
-                Write("\t/{0}\t{1}", parameter.Name, parameter.Description);
+                Write();
+                Write("Optional arguments:");
+                Write();
+
+                foreach (var parameter in parameters.Where(p => p.Position == 0))
+                {
+                    Write("\t/{0}\t{1}", parameter.Name, parameter.Description);
+                }
             }
         }
 
