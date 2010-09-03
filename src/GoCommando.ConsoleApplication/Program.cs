@@ -11,6 +11,7 @@ namespace GoCommando.ConsoleApplication
     {
         [PositionalArgument]
         [Description("The path to the file you wish to do stuff to")]
+        [Example("c:\\temp\\somefile.txt")]
         public string Path { get; set; }
 
         [PositionalArgument]

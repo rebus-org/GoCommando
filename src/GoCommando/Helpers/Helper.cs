@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -23,7 +24,7 @@ namespace GoCommando.Helpers
                 .ToList();
         }
 
-        Parameter CreateParameter(ICustomAttributeProvider propertyInfo, HelperContext context)
+        Parameter CreateParameter(PropertyInfo propertyInfo, HelperContext context)
         {
             var attributes = propertyInfo.GetAttributes<DescriptionAttribute>();
 
@@ -48,6 +49,14 @@ namespace GoCommando.Helpers
                 parameter.Position = context.Position;
             }
 
+            parameter.PropertyInfo = propertyInfo;
+            parameter.ArgumentAttribute = argumentAttribute;
+
+            foreach(var example in propertyInfo.GetAttributes<ExampleAttribute>())
+            {
+                parameter.Examples.Add(example);
+            }
+
             return parameter;
         }
 
@@ -59,11 +68,21 @@ namespace GoCommando.Helpers
 
     public class Parameter
     {
+        public Parameter()
+        {
+            Examples = new List<ExampleAttribute>();
+        }
+
         public string Description { get; set; }
 
         public string Name { get; set; }
         public string Shorthand { get; set; }
 
         public int Position { get; set; }
+
+        public PropertyInfo PropertyInfo { get; set; }
+        public ArgumentAttribute ArgumentAttribute { get; set; }
+
+        public List<ExampleAttribute> Examples { get; set; }
     }
 }

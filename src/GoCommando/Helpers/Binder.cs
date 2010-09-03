@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using GoCommando.Attributes;
 using GoCommando.Exceptions;
-using GoCommando.Extensions;
 using GoCommando.Parameters;
 
 namespace GoCommando.Helpers
@@ -14,10 +13,12 @@ namespace GoCommando.Helpers
         public void Bind(object targetObjectWithAttributes, IEnumerable<CommandLineParameter> parametersToBind)
         {
             var context = new BindingContext();
-            foreach (var property in targetObjectWithAttributes.GetType().GetProperties().Where(ShouldBeBound))
+            var helper = new Helper();
+
+            foreach (var parameter in helper.GetParameters(targetObjectWithAttributes))
             {
-                Bind(targetObjectWithAttributes, property, parametersToBind.ToList(),
-                     property.GetAttributes<ArgumentAttribute>().Single(),
+                Bind(targetObjectWithAttributes, parameter.PropertyInfo, parametersToBind.ToList(),
+                     parameter.ArgumentAttribute,
                      context);
             }
         }
@@ -82,11 +83,6 @@ namespace GoCommando.Helpers
         CommandoException Ex(string message, params object[] objs)
         {
             return new CommandoException(message, objs);
-        }
-
-        bool ShouldBeBound(PropertyInfo info)
-        {
-            return info.HasAttribute<ArgumentAttribute>();
         }
     }
 }

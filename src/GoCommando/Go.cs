@@ -93,7 +93,7 @@ namespace GoCommando
             if (thereAreOptionalArguments)
             {
                 Write();
-                Write("Optional arguments:");
+                Write("Additional arguments:");
                 Write();
 
                 foreach (var parameter in parameters.Where(p => p.Position == 0))
@@ -106,7 +106,7 @@ namespace GoCommando
         static bool ShouldShowHelpText(string[] strings)
         {
             return strings.Length == 1
-                   && new List<string> {"-h", "--h", "/h", "-?", "/?"}.Contains(strings[0].ToLowerInvariant());
+                   && new List<string> {"-h", "--h", "/h", "-?", "/?", "?"}.Contains(strings[0].ToLowerInvariant());
         }
 
         static ICommando CreateInstance<TCommando>()
