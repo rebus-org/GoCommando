@@ -12,10 +12,12 @@ namespace GoCommando.ConsoleApplication
         [PositionalArgument]
         [Description("The path to the file you wish to do stuff to")]
         [Example("c:\\temp\\somefile.txt")]
+        [Example("c:\\temp\\anotherfile.txt")]
         public string Path { get; set; }
 
         [PositionalArgument]
         [Description("The value of something")]
+        [Example("59")]
         public double Value { get; set; }
 
         [NamedArgument("someflag", "sf")]

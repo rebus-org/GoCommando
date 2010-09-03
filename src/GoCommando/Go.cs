@@ -76,31 +76,56 @@ namespace GoCommando
             Write("\t{0} {1}{2}",
                   exeName,
                   parameterList,
-                  thereAreOptionalArguments ? " [...]" : "");
+                  thereAreOptionalArguments ? " [args]" : "");
 
             if (thereAreRequiredArguments)
             {
                 Write();
-                Write("Required arguments:");
                 Write();
+                Write("Required arguments:");
 
                 foreach (var parameter in parameters.Where(p => p.Position > 0))
                 {
+                    Write();
+
                     Write("\t[{0}] {1}", parameter.Position, parameter.Description);
+
+                    PossibleWriteExamples(parameter);
                 }
             }
 
             if (thereAreOptionalArguments)
             {
                 Write();
-                Write("Additional arguments:");
                 Write();
+                Write("Additional arguments:");
 
                 foreach (var parameter in parameters.Where(p => p.Position == 0))
                 {
+                    Write();
+
                     Write("\t/{0}\t{1}", parameter.Name, parameter.Description);
+
+                    PossibleWriteExamples(parameter);
                 }
             }
+        }
+
+        static void PossibleWriteExamples(Parameter parameter)
+        {
+            var examples = parameter.Examples;
+
+            if (!examples.Any()) return;
+
+            var headline = examples.Count > 1 ? "Examples" : "Example";
+            var maxLength = examples.Max(e => e.Text.Length);
+            var printExamplesOnMultipleLines = maxLength > 7;
+            var separator = printExamplesOnMultipleLines ? (Environment.NewLine + "\t\t\t") : ", ";
+
+            Write("\t\t{0}: {1}{2}", 
+                headline, 
+                printExamplesOnMultipleLines ? separator : "",
+                string.Join(separator, examples.Select(e => e.Text).ToArray()));
         }
 
         static bool ShouldShowHelpText(string[] strings)
