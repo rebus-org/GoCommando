@@ -1,6 +1,6 @@
 namespace GoCommando.Parameters
 {
-    class PositionalCommandLineParameter : CommandLineParameter
+    public class PositionalCommandLineParameter : CommandLineParameter
     {
         public PositionalCommandLineParameter(int index, string value) : base(value)
         {

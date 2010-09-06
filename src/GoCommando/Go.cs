@@ -37,14 +37,14 @@ namespace GoCommando
 
                 var parameters = GetParameters(args);
 
-                if (RequiredParameterMissing(parameters))
+                var bindingReport = PopulateProperties(parameters, instance);
+
+                if (RequiredParameterMissing(bindingReport))
                 {
-                    Console.WriteLine("MISSING!");
+                    ShowMissingParameters(bindingReport);
 
                     return 1;
                 }
-                
-                PopulateProperties(parameters, instance);
 
                 Execute(instance);
 
@@ -53,6 +53,8 @@ namespace GoCommando
             catch (CommandoException e)
             {
                 Write(e.Message);
+
+                WriteHelpInstructions();
 
                 return 2;
             }
@@ -64,10 +66,35 @@ namespace GoCommando
             }
         }
 
-        static bool RequiredParameterMissing(List<CommandLineParameter> parameters)
+        static void ShowMissingParameters(BindingReport report)
         {
-            return parameters.Any(p => p is PositionalCommandLineParameter
-                                       && p.Value == null);
+            Write("One or more required arguments are missing!");
+            Write();
+
+            var context = new BindingContext();
+
+            foreach (var parameter in report.PropertiesNotBound.Select(p => new Parameter(p, context)).Where(p => p.Position > 0))
+            {
+                WritePositionalParameter(parameter, ExampleOutputSettings.DontShowExamples);
+            }
+
+            WriteHelpInstructions();
+        }
+
+        static void WriteHelpInstructions()
+        {
+            Write();
+            Write("Invoke with /? for detailed help.");
+        }
+
+        class BindingContext : IHasPositionerCounter
+        {
+            public int Position { get; set; }
+        }
+
+        static bool RequiredParameterMissing(BindingReport bindingReport)
+        {
+            return bindingReport.PropertiesNotBound.Any();
         }
 
         static void ShowHelpText(ICommando commando)
@@ -101,9 +128,7 @@ namespace GoCommando
                 {
                     Write();
 
-                    Write("\t[{0}] {1}", parameter.Position, parameter.Description);
-
-                    PossibleWriteExamples(parameter);
+                    WritePositionalParameter(parameter, ExampleOutputSettings.ShowExamples);
                 }
             }
 
@@ -121,6 +146,22 @@ namespace GoCommando
 
                     PossibleWriteExamples(parameter);
                 }
+            }
+        }
+
+        enum ExampleOutputSettings
+        {
+            ShowExamples,
+            DontShowExamples,
+        }
+
+        static void WritePositionalParameter(Parameter parameter, ExampleOutputSettings outputExamples)
+        {
+            Write("\t[{0}] {1}", parameter.Position, parameter.Description);
+
+            if (outputExamples == ExampleOutputSettings.ShowExamples)
+            {
+                PossibleWriteExamples(parameter);
             }
         }
 
@@ -181,10 +222,11 @@ namespace GoCommando
             return parser.Parse(args);
         }
 
-        static void PopulateProperties(IEnumerable<CommandLineParameter> parameters, ICommando instance)
+        static BindingReport PopulateProperties(IEnumerable<CommandLineParameter> parameters, ICommando instance)
         {
             var binder = new Binder();
-            binder.Bind(instance, parameters);
+            var report = binder.Bind(instance, parameters);
+            return report;
         }
 
         static void Execute(ICommando instance)

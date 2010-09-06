@@ -18,6 +18,31 @@ namespace GoCommando.Tests.Helpers
         }
 
         [Test]
+        public void GeneratesReportOfUnboundParameters()
+        {
+            var target = new HasProperties();
+
+            var report = binder.Bind(target, ListWith());
+
+            Assert.AreEqual(4, report.PropertiesNotBound.Count);
+            Assert.AreEqual(0, report.PropertiesBound.Count);
+        }
+
+        [Test]
+        public void GeneratesReportOfBoundParameters()
+        {
+            var target = new HasProperties();
+
+            var report = binder.Bind(target, ListWith(PositionalParameter(1, "1"),
+                                                      PositionalParameter(2, "2"),
+                                                      NamedParameter("bim1", "3"),
+                                                      NamedParameter("bim2", "4")));
+
+            Assert.AreEqual(0, report.PropertiesNotBound.Count);
+            Assert.AreEqual(4, report.PropertiesBound.Count);
+        }
+
+        [Test]
         public void CanBindSimpleIntegerParameter()
         {
             var target = new HasPrimitiveTypes();
@@ -47,6 +72,21 @@ namespace GoCommando.Tests.Helpers
             Assert.AreEqual(23.5, target.DoubleValue);
         }
 
+        class HasProperties
+        {
+            [PositionalArgument]
+            public string Arg1 { get; set; }
+            
+            [PositionalArgument]
+            public string Arg2 { get; set; }
+
+            [NamedArgument("bim1", "b1")]
+            public string Arg3 { get; set; }
+
+            [NamedArgument("bim2", "b2")]
+            public string Arg4 { get; set; }
+        }
+
         class HasPrimitiveTypes
         {
             [NamedArgument("int", "i")]
@@ -67,6 +107,11 @@ namespace GoCommando.Tests.Helpers
         CommandLineParameter NamedParameter(string name, string value)
         {
             return new NamedCommandLineParameter(name, value);
+        }
+
+        CommandLineParameter PositionalParameter(int index, string value)
+        {
+            return new PositionalCommandLineParameter(index, value);
         }
     }
 }

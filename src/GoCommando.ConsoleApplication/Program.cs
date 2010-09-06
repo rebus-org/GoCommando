@@ -1,5 +1,4 @@
-﻿using System;
-using GoCommando.Api;
+﻿using GoCommando.Api;
 using GoCommando.Attributes;
 
 namespace GoCommando.ConsoleApplication

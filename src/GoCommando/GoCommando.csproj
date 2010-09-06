@@ -52,9 +52,12 @@
     <Compile Include="Exceptions\CommandoException.cs" />
     <Compile Include="Extensions\AttributeExtensions.cs" />
     <Compile Include="Helpers\Binder.cs" />
+    <Compile Include="Helpers\BindingReport.cs" />
     <Compile Include="Helpers\DefaultCommandoFactory.cs" />
     <Compile Include="Helpers\ArgParser.cs" />
     <Compile Include="Helpers\Helper.cs" />
+    <Compile Include="Helpers\IHasPositionerCounter.cs" />
+    <Compile Include="Helpers\Parameter.cs" />
     <Compile Include="Parameters\CommandLineParameter.cs" />
     <Compile Include="Go.cs" />
     <Compile Include="Api\ICommando.cs" />
