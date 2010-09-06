@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -18,6 +16,7 @@ namespace GoCommando.Helpers
         public List<Parameter> GetParameters(object obj)
         {
             var context = new HelperContext();
+
             return obj.GetType().GetProperties()
                 .Where(ShouldBeIncluded)
                 .Select(p => CreateParameter(p, context))

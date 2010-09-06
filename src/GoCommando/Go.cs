@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using GoCommando.Api;
@@ -9,7 +8,7 @@ using GoCommando.Exceptions;
 using GoCommando.Extensions;
 using GoCommando.Helpers;
 using GoCommando.Parameters;
-using Binder=GoCommando.Helpers.Binder;
+using Binder = GoCommando.Helpers.Binder;
 
 namespace GoCommando
 {
@@ -38,6 +37,13 @@ namespace GoCommando
 
                 var parameters = GetParameters(args);
 
+                if (RequiredParameterMissing(parameters))
+                {
+                    Console.WriteLine("MISSING!");
+
+                    return 1;
+                }
+                
                 PopulateProperties(parameters, instance);
 
                 Execute(instance);
@@ -58,6 +64,12 @@ namespace GoCommando
             }
         }
 
+        static bool RequiredParameterMissing(List<CommandLineParameter> parameters)
+        {
+            return parameters.Any(p => p is PositionalCommandLineParameter
+                                       && p.Value == null);
+        }
+
         static void ShowHelpText(ICommando commando)
         {
             var helper = new Helper();
@@ -73,10 +85,11 @@ namespace GoCommando
 
             Write("Usage:");
             Write();
-            Write("\t{0} {1}{2}",
+            Write("\t{0} {1}{2}{3}",
                   exeName,
                   parameterList,
-                  thereAreOptionalArguments ? " [args]" : "");
+                  parameterList.Length > 0 ? " " : "",
+                  thereAreOptionalArguments ? "[args]" : "");
 
             if (thereAreRequiredArguments)
             {

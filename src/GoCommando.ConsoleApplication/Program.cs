@@ -43,18 +43,18 @@ namespace GoCommando.ConsoleApplication
 
         public void Run()
         {
-            Console.WriteLine(@"Path: {0} (expected: c:\program files\somepath\somefile.txt)
-Value: {1} (expected 34.67)
-Some flag: {2} (expected True)
-Some value: {3} (expected 23))
-Another value: {4} (expected bim)
-Another flag: {5} (expected False)", 
-                   Path, 
-                   Value,
-                              SomeFlag, 
-                              SomeValue, 
-                              AnotherValue,
-                              AnotherFlag);
+//            Console.WriteLine(@"Path: {0} (expected: c:\program files\somepath\somefile.txt)
+//Value: {1} (expected 34.67)
+//Some flag: {2} (expected True)
+//Some value: {3} (expected 23))
+//Another value: {4} (expected bim)
+//Another flag: {5} (expected False)", 
+//                   Path, 
+//                   Value,
+//                              SomeFlag, 
+//                              SomeValue, 
+//                              AnotherValue,
+//                              AnotherFlag);
         }
     }
 }
