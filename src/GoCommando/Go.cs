@@ -89,6 +89,11 @@ namespace GoCommando
 
         class BindingContext : IHasPositionerCounter
         {
+            public BindingContext()
+            {
+                Position = 1;
+            }
+
             public int Position { get; set; }
         }
 

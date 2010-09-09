@@ -1,0 +1,37 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ProjectReferences Include="..\src\GoCommando\GoCommando.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <BuildDestination>..\deploy</BuildDestination>
+  </PropertyGroup>
+
+  <Target Name="build" DependsOnTargets="cleanBinaries;deleteBuildDestination;buildProjects;copyToBuildDestination" />
+
+  <Target Name="buildProjects">
+    <Message Text="Building projects in Release configuration"/>
+    
+    <MSBuild Projects="@(ProjectReferences)" Targets="build" StopOnFirstFailure="true" Properties="Configuration=Release">
+      <Output TaskParameter="TargetOutputs" ItemName="AssembliesBuiltByChildProjects" />
+    </MSBuild>
+  </Target>
+
+  <Target Name="cleanBinaries">
+    <Message Text="Cleaning binaries from previous build"/>
+    
+    <MSBuild Projects="@(ProjectReferences)" Targets="clean" StopOnFirstFailure="true" Properties="Configuration=Release" />
+  </Target>
+
+  <Target Name="deleteBuildDestination">
+    <Message Text="Removing build destination"/>
+    
+    <RemoveDir Directories="$(BuildDestination)" />
+  </Target>
+  
+  <Target Name="copyToBuildDestination">
+    <Message Text="Copying output to build destination"/>
+
+    <Copy SourceFiles="@(AssembliesBuiltByChildProjects)" DestinationFolder="$(BuildDestination)" />
+  </Target>
+</Project>

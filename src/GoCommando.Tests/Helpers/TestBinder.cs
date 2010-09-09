@@ -18,6 +18,26 @@ namespace GoCommando.Tests.Helpers
         }
 
         [Test]
+        public void UsesDefaultIfSpecified()
+        {
+            var target = new HasDefaultParameters();
+
+            binder.Bind(target, ListWith());
+
+            Assert.AreEqual("hello!", target.Something1);
+            Assert.IsNull(target.Something2);
+        }
+
+        class HasDefaultParameters
+        {
+            [NamedArgument("something1", "s1", Default = "hello!")]
+            public string Something1 { get; set; }
+
+            [NamedArgument("something2", "s2")]
+            public string Something2 { get; set; }
+        }
+
+        [Test]
         public void GeneratesReportOfUnboundParameters()
         {
             var target = new HasProperties();

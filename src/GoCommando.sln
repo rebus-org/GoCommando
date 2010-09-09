@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoCommando.Tests", "GoComma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoCommando.ConsoleApplication", "GoCommando.ConsoleApplication\GoCommando.ConsoleApplication.csproj", "{8F0347E7-51AF-42F8-A259-F5DE19C6D858}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3903DEE6-D83F-4328-B15D-129FA4658AA9}"
+	ProjectSection(SolutionItems) = preProject
+		..\scripts\build.proj = ..\scripts\build.proj
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

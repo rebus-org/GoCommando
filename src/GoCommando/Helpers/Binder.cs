@@ -14,8 +14,9 @@ namespace GoCommando.Helpers
         {
             var context = new BindingContext();
             var helper = new Helper();
-
-            foreach (var parameter in helper.GetParameters(targetObjectWithAttributes))
+            var parameters = helper.GetParameters(targetObjectWithAttributes);
+            
+            foreach (var parameter in parameters)
             {
                 Bind(targetObjectWithAttributes, parameter.PropertyInfo, parametersToBind.ToList(),
                      parameter.ArgumentAttribute,
@@ -27,6 +28,11 @@ namespace GoCommando.Helpers
 
         class BindingContext
         {
+            public BindingContext()
+            {
+                Position = 1;
+            }
+
             readonly BindingReport report = new BindingReport();
 
             public int Position { get; set; }
@@ -62,7 +68,13 @@ namespace GoCommando.Helpers
                 .Cast<NamedCommandLineParameter>()
                 .SingleOrDefault(p => p.Name == name || p.Name == shortHand);
 
-            if (parameter == null)
+            var value = parameter != null
+                            ? Mutate(parameter, property)
+                            : attribute.Default != null
+                                  ? Mutate(attribute.Default, property)
+                                  : null;
+
+            if (value == null)
             {
                 context.Report.PropertiesNotBound.Add(property);
 
@@ -71,7 +83,7 @@ namespace GoCommando.Helpers
                 throw Ex("Could not find parameter matching required parameter named {0}", name);
             }
 
-            property.SetValue(commando, Mutate(parameter, property), null);
+            property.SetValue(commando, value, null);
 
             context.Report.PropertiesBound.Add(property);
         }
@@ -99,14 +111,18 @@ namespace GoCommando.Helpers
 
         object Mutate(CommandLineParameter parameter, PropertyInfo property)
         {
-            var value = parameter.Value;
+            return Mutate(parameter.Value, property);
+        }
+
+        object Mutate(string value, PropertyInfo property)
+        {
             var propertyType = property.PropertyType;
 
             try
             {
                 return Convert.ChangeType(value, propertyType);
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 throw Ex("Could not automatically turn '{0}' into a value of type {1}", value,
                          propertyType.Name);
