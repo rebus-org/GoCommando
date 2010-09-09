@@ -29,8 +29,7 @@ namespace GoCommando.Helpers
             }
             else if (argumentAttribute is PositionalArgumentAttribute)
             {
-                context.Position++;
-                Position = context.Position;
+                Position = context.Position++;
             }
 
             PropertyInfo = propertyInfo;

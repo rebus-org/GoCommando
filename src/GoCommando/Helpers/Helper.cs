@@ -10,6 +10,11 @@ namespace GoCommando.Helpers
     {
         class HelperContext : IHasPositionerCounter
         {
+            public HelperContext()
+            {
+                Position = 1;
+            }
+
             public int Position { get; set; }
         }
 
