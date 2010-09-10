@@ -18,6 +18,16 @@ namespace GoCommando.Tests
         }
 
         [Test]
+        public void IndexIsOneBased()
+        {
+            var parameters = parser.Parse(new[]{"firstArg", "secondArg"})
+                .Cast<PositionalCommandLineParameter>().ToList();
+
+            Assert.AreEqual(1, parameters[0].Index);
+            Assert.AreEqual(2, parameters[1].Index);
+        }
+
+        [Test]
         public void EmptyArrayYieldsNoArguments()
         {
             var timer = new Timer();

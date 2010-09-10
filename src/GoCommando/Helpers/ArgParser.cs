@@ -12,6 +12,7 @@ namespace GoCommando.Helpers
             public ParserContext()
             {
                 ParsingPositionalParameters = true;
+                Index = 1;
             }
 
             public int Index { get; set; }
