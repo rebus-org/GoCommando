@@ -5,6 +5,7 @@ namespace GoCommando.Helpers
 {
     public class BindingReport
     {
+        readonly List<PropertyInfo> requiredPropertiesNotBound = new List<PropertyInfo>();
         readonly List<PropertyInfo> propertiesNotBound = new List<PropertyInfo>();
         readonly List<PropertyInfo> propertiesBound = new List<PropertyInfo>();
 
@@ -16,6 +17,11 @@ namespace GoCommando.Helpers
         public List<PropertyInfo> PropertiesBound
         {
             get { return propertiesBound; }
+        }
+
+        public List<PropertyInfo> RequiredPropertiesNotBound
+        {
+            get { return requiredPropertiesNotBound; }
         }
     }
 }

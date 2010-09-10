@@ -5,7 +5,7 @@ using GoCommando.Helpers;
 using GoCommando.Parameters;
 using NUnit.Framework;
 
-namespace GoCommando.Tests
+namespace GoCommando.Tests.Helpers
 {
     [TestFixture]
     public class TestArgParser : FixtureBase
@@ -43,7 +43,7 @@ namespace GoCommando.Tests
         [Test]
         public void DoesNotThrowIfItsAFlag()
         {
-            var parameter = parser.Parse(new[]{"/param"}).Cast<NamedCommandLineParameter>().Single();
+            var parameter = parser.Parse(new[]{"-param"}).Cast<NamedCommandLineParameter>().Single();
             Assert.AreEqual("param", parameter.Name);
             Assert.AreEqual("True", parameter.Value);
         }
@@ -51,7 +51,7 @@ namespace GoCommando.Tests
         [Test]
         public void CanParseArrayOfArguments()
         {
-            var args = new []{"some.assembly", "another.assembly", "/param2:bimmelim", "/param1:boom"};
+            var args = new []{"some.assembly", "another.assembly", "-param2:bimmelim", "-param1:boom"};
             var parameters = parser.Parse(args);
 
             Assert.AreEqual(4, parameters.Count);
@@ -69,8 +69,19 @@ namespace GoCommando.Tests
         [Test]
         public void ThrowsIfPositionalParametersAreMixedWithNamedParameters()
         {
-            Assert.Throws<FormatException>(() => parser.Parse(new[] {"/named:parameter", "positional.parameter"}));
-            Assert.Throws<FormatException>(() => parser.Parse(new[] {"/named.flag", "positional.parameter"}));
+            Assert.Throws<FormatException>(() => parser.Parse(new[] {"-named:parameter", "positional.parameter"}));
+            Assert.Throws<FormatException>(() => parser.Parse(new[] {"-named.flag", "positional.parameter"}));
+        }
+
+        [Test]
+        public void AcceptsSlashAsPositionalParameter()
+        {
+            var args = new []{"/src/somepath", "/src/anotherpath"};
+            var parameters = parser.Parse(args);
+
+            Assert.AreEqual(2, parameters.Count);
+            Assert.IsTrue(parameters[0] is PositionalCommandLineParameter);
+            Assert.IsTrue(parameters[1] is PositionalCommandLineParameter);
         }
 
         void AssertYieldsNoParameters(string[] args)

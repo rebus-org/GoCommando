@@ -35,7 +35,12 @@ namespace GoCommando.Helpers
 
             readonly BindingReport report = new BindingReport();
 
-            public int Position { get; set; }
+            public int Position { get; private set; }
+
+            public void IncrementPosition()
+            {
+                Position++;
+            }
 
             public BindingReport Report
             {
@@ -48,7 +53,6 @@ namespace GoCommando.Helpers
             if (attribute is PositionalArgumentAttribute)
             {
                 BindPositional(commando, property, parameters, (PositionalArgumentAttribute) attribute, context);
-                context.Position++;
             }
             else if (attribute is NamedArgumentAttribute)
             {
@@ -98,6 +102,7 @@ namespace GoCommando.Helpers
             if (parameter == null)
             {
                 context.Report.PropertiesNotBound.Add(property);
+                context.Report.RequiredPropertiesNotBound.Add(property);
 
                 if (!attribute.Required) return;
 
@@ -107,6 +112,7 @@ namespace GoCommando.Helpers
             property.SetValue(commando, Mutate(parameter, property), null);
 
             context.Report.PropertiesBound.Add(property);
+            context.IncrementPosition();
         }
 
         object Mutate(CommandLineParameter parameter, PropertyInfo property)

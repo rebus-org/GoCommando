@@ -99,7 +99,7 @@ namespace GoCommando
 
         static bool RequiredParameterMissing(BindingReport bindingReport)
         {
-            return bindingReport.PropertiesNotBound.Any();
+            return bindingReport.RequiredPropertiesNotBound.Any();
         }
 
         static void ShowHelpText(ICommando commando)

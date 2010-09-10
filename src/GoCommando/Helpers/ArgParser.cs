@@ -31,7 +31,7 @@ namespace GoCommando.Helpers
         CommandLineParameter ToCommandLineParameter(string arg, ParserContext context)
         {
             return
-                !arg.StartsWith("/")
+                !arg.StartsWith("-")
                     ? CreatePositionalCommandLineParameter(arg, context)
                     : CreateNamedCommandLineParameter(arg, context);
         }
