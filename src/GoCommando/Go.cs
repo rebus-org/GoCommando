@@ -202,13 +202,13 @@ namespace GoCommando
         static void PossiblyShowBanner(object obj)
         {
             var type = obj.GetType();
-            type.WithAttributes<BannerAttribute>(ShowBanner);
+            type.WithAttributes<BannerAttribute>(a => ShowBanner(a, type.Assembly));
             Write();
         }
 
-        static void ShowBanner(BannerAttribute attribute)
+        static void ShowBanner(BannerAttribute attribute, Assembly assembly)
         {
-            Write(attribute.Text);
+            Write(attribute.Text.Replace("{assemblyVersion}", assembly.GetName().Version.ToString()));
         }
 
         static void Write()
