@@ -147,7 +147,7 @@ namespace GoCommando
                 {
                     Write();
 
-                    Write("\t/{0}\t{1}", parameter.Name, parameter.Description);
+                    Write("\t-{0}\t{1}", parameter.Name, parameter.Description);
 
                     PossibleWriteExamples(parameter);
                 }
