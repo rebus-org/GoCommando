@@ -50,17 +50,14 @@ namespace GoCommando.Helpers
         {
             context.ParsingPositionalParameters = false;
 
-            // trim /
+            // trim -
             arg = arg.Substring(1);
 
-            var tokens = arg.Split(':');
+            var separatorIndex = arg.IndexOf(':');
 
-            if (tokens.Length == 1)
-            {
-                return new NamedCommandLineParameter(tokens.Single(), "True");
-            }
-
-            return new NamedCommandLineParameter(tokens.First(), string.Join("", tokens.Skip(1).ToArray()));
+            return separatorIndex == -1 
+                ? new NamedCommandLineParameter(arg, "True") 
+                : new NamedCommandLineParameter(arg.Substring(0, separatorIndex), arg.Substring(separatorIndex + 1));
         }
     }
 }

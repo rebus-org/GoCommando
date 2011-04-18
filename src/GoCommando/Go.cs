@@ -84,7 +84,7 @@ namespace GoCommando
         static void WriteHelpInstructions()
         {
             Write();
-            Write("Invoke with /? for detailed help.");
+            Write("Invoke with -? for detailed help.");
         }
 
         class BindingContext : IHasPositionerCounter

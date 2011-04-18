@@ -18,6 +18,16 @@ namespace GoCommando.Tests.Helpers
         }
 
         [Test]
+        public void CanParseParameterWithAbsolutePath()
+        {
+            var parameter = parser.Parse(new[]{"-path:c:\\temp\\someFile.txt"})
+                .Cast<NamedCommandLineParameter>().Single();
+
+            Assert.AreEqual("path", parameter.Name);
+            Assert.AreEqual("c:\\temp\\someFile.txt", parameter.Value);
+        }
+
+        [Test]
         public void IndexIsOneBased()
         {
             var parameters = parser.Parse(new[]{"firstArg", "secondArg"})
