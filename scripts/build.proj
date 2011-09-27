@@ -5,6 +5,7 @@
 
   <PropertyGroup>
     <BuildDestination>..\deploy</BuildDestination>
+    <ToolsDir>..\tools</ToolsDir>
   </PropertyGroup>
 
   <Target Name="build" DependsOnTargets="cleanBinaries;deleteBuildDestination;buildProjects;copyToBuildDestination" />
@@ -33,5 +34,11 @@
     <Message Text="Copying output to build destination"/>
 
     <Copy SourceFiles="@(AssembliesBuiltByChildProjects)" DestinationFolder="$(BuildDestination)" />
+  </Target>
+
+  <Target Name="createNugetPackage">
+    <Message Text="Creating NuGet package"/>
+
+    <Exec Command="$(ToolsDir)\nuget pack @(ProjectReferences) -Prop Configuration=Release"/>
   </Target>
 </Project>

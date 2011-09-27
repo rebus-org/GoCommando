@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>GoCommando</id>
+    <version>0.2</version>
+    <authors>Mogens Heller Grabe</authors>
+    <owners>Mogens Heller Grabe</owners>
+    <licenseUrl>http://en.wikipedia.org/wiki/Beerware</licenseUrl>
+    <projectUrl>http://mookid.dk/oncode/gocommando</projectUrl>
+    <description>GoCommando is a small command line utility helper that does the boring work when creating command line utilities in .NET.</description>
+    <copyright>Copyright 2011</copyright>
+    <tags>command-line</tags>
+    <dependencies>
+      <dependency id="SampleDependency" version="1.0" />
+    </dependencies>
+  </metadata>
+</package>
