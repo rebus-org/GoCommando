@@ -14,11 +14,39 @@ namespace GoCommando
 {
     public static class Go
     {
-        public static int Run<TCommando>(string[] args, Func<Type, TCommando> factory) where TCommando : ICommando
+        /// <summary>
+        /// Runs the specified type, GoCommando style. What this means is that:
+        ///     * if type is decorated with [Banner(...)], that banner will be output
+        ///     * args will be bound to public properties decorated with [PositionalArgument] and [NamedArgument]
+        ///     * validation (if any) will be run
+        ///     * help text will be shown where appropriate
+        /// 
+        /// GoCommando will use the default <see cref="Activator"/>-powered way of creating
+        /// the <see cref="TCommando"/> instance when it is needed.
+        /// </summary>
+        public static int Run<TCommando>(string[] args) where TCommando : ICommando
+        {
+            Func<TCommando> defaultCommandoFactoryMethod = 
+                () => (TCommando) Activator.CreateInstance(typeof (TCommando));
+            
+            return Run(args, defaultCommandoFactoryMethod);
+        }
+
+        /// <summary>
+        /// Runs the specified type, GoCommando style. What this means is that:
+        ///     * if type is decorated with [Banner(...)], that banner will be output
+        ///     * args will be bound to public properties decorated with [PositionalArgument] and [NamedArgument]
+        ///     * validation (if any) will be run
+        ///     * help text will be shown where appropriate
+        /// 
+        /// The specified factory method will be used to obtain the <see cref="TCommando"/> instance 
+        /// when it is needed.
+        /// </summary>
+        public static int Run<TCommando>(string[] args, Func<TCommando> factoryMethod) where TCommando : ICommando
         {
             try
             {
-                var instance = factory.Invoke(typeof(TCommando));
+                var instance = factoryMethod();
 
                 PossiblyShowBanner(instance);
 
@@ -57,18 +85,6 @@ namespace GoCommando
 
                 return 1;
             }
-        }
-
-        /// <summary>
-        /// Runs the specified type, GoCommando style. What this means is that:
-        ///     * if type is decorated with [Banner(...)], that banner will be output
-        ///     * args will be bound to public properties decorated with [PositionalArgument] and [NamedArgument]
-        ///     * validation (if any) will be run
-        ///     * help text will be shown where appropriate
-        /// </summary>
-        public static int Run<TCommando>(string[] args) where TCommando : ICommando
-        {
-            return Run(args, x => CreateInstance<TCommando>());
         }
 
         static void ShowMissingParameters(BindingReport report)
@@ -196,12 +212,6 @@ namespace GoCommando
         {
             return strings.Length == 1
                    && new List<string> {"-h", "--h", "/h", "-?", "/?", "?"}.Contains(strings[0].ToLowerInvariant());
-        }
-
-        static ICommando CreateInstance<TCommando>() where TCommando : ICommando
-        {
-            var factory = new DefaultCommandoFactory();
-            return factory.Create(typeof(TCommando));
         }
 
         static void PossiblyShowBanner(object obj)
