@@ -14,18 +14,11 @@ namespace GoCommando
 {
     public static class Go
     {
-        /// <summary>
-        /// Runs the specified type, GoCommando style. What this means is that:
-        ///     * if type is decorated with [Banner(...)], that banner will be output
-        ///     * args will be bound to public properties decorated with [PositionalArgument] and [NamedArgument]
-        ///     * validation (if any) will be run
-        ///     * help text will be shown where appropriate
-        /// </summary>
-        public static int Run<TCommando>(string[] args) where TCommando : ICommando
+        public static int Run<TCommando>(string[] args, Func<Type, TCommando> factory) where TCommando : ICommando
         {
             try
             {
-                var instance = CreateInstance<TCommando>();
+                var instance = factory.Invoke(typeof(TCommando));
 
                 PossiblyShowBanner(instance);
 
@@ -64,6 +57,18 @@ namespace GoCommando
 
                 return 1;
             }
+        }
+
+        /// <summary>
+        /// Runs the specified type, GoCommando style. What this means is that:
+        ///     * if type is decorated with [Banner(...)], that banner will be output
+        ///     * args will be bound to public properties decorated with [PositionalArgument] and [NamedArgument]
+        ///     * validation (if any) will be run
+        ///     * help text will be shown where appropriate
+        /// </summary>
+        public static int Run<TCommando>(string[] args) where TCommando : ICommando
+        {
+            return Run(args, x => CreateInstance<TCommando>());
         }
 
         static void ShowMissingParameters(BindingReport report)
@@ -193,7 +198,7 @@ namespace GoCommando
                    && new List<string> {"-h", "--h", "/h", "-?", "/?", "?"}.Contains(strings[0].ToLowerInvariant());
         }
 
-        static ICommando CreateInstance<TCommando>()
+        static ICommando CreateInstance<TCommando>() where TCommando : ICommando
         {
             var factory = new DefaultCommandoFactory();
             return factory.Create(typeof(TCommando));
