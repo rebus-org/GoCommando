@@ -8,7 +8,7 @@
     <ToolsDir>..\tools</ToolsDir>
   </PropertyGroup>
 
-  <Target Name="build" DependsOnTargets="cleanBinaries;deleteBuildDestination;buildProjects;copyToBuildDestination" />
+  <Target Name="build" DependsOnTargets="cleanBinaries;deleteBuildDestination;buildProjects;copyToBuildDestination;createNugetPackage" />
 
   <Target Name="buildProjects">
     <Message Text="Building projects in Release configuration"/>
@@ -39,6 +39,6 @@
   <Target Name="createNugetPackage">
     <Message Text="Creating NuGet package"/>
 
-    <Exec Command="$(ToolsDir)\nuget pack @(ProjectReferences) -Prop Configuration=Release"/>
+    <Exec Command="$(ToolsDir)\nuget pack @(ProjectReferences) -Prop Configuration=Release -OutputDirectory $(BuildDestination)"/>
   </Target>
 </Project>
