@@ -6,14 +6,17 @@ namespace GoCommando.Internals
 {
     class Arguments
     {
-        public Arguments(string command, IEnumerable<Switch> switches)
+        readonly Settings _settings;
+
+        public Arguments(string command, IEnumerable<Switch> switches, Settings settings)
         {
+            _settings = settings;
             var switchList = switches.ToList();
             var duplicateSwitchKeys = switchList.GroupBy(s => s.Key).Where(g => g.Count() > 1).ToList();
 
             if (duplicateSwitchKeys.Any())
             {
-                var dupes = string.Join(", ", duplicateSwitchKeys.Select(g => g.Key));
+                var dupes = string.Join(", ", duplicateSwitchKeys.Select(g => $"{settings.SwitchPrefix}{g.Key}"));
 
                 throw new GoCommandoException($"The following switches have been specified more than once: {dupes}");
             }

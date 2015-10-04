@@ -43,8 +43,9 @@ namespace GoCommando
         static void InnerRun()
         {
             var args = Environment.GetCommandLineArgs().Skip(1).ToList();
-            var arguments = Parse(args, new Settings());
-            var commandTypes = GetCommands();
+            var settings = new Settings();
+            var arguments = Parse(args, settings);
+            var commandTypes = GetCommands(settings);
 
             var commandToRun = commandTypes.FirstOrDefault(c => c.Command == arguments.Command);
 
@@ -60,7 +61,7 @@ namespace GoCommando
             commandToRun.Invoke(arguments.Switches);
         }
 
-        internal static List<CommandInvoker> GetCommands()
+        internal static List<CommandInvoker> GetCommands(Settings settings)
         {
             return Assembly.GetEntryAssembly().GetTypes()
                 .Select(t => new
@@ -69,7 +70,7 @@ namespace GoCommando
                     Attribute = t.GetCustomAttribute<CommandAttribute>()
                 })
                 .Where(a => a.Attribute != null)
-                .Select(a => new CommandInvoker(a.Attribute.Command, a.Type))
+                .Select(a => new CommandInvoker(a.Attribute.Command, a.Type, settings))
                 .ToList();
         }
 
@@ -117,7 +118,7 @@ namespace GoCommando
                 switches.Add(Switch.Flag(key));
             }
 
-            return new Arguments(command, switches);
+            return new Arguments(command, switches, settings);
         }
     }
 }

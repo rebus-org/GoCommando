@@ -6,8 +6,12 @@ namespace GoCommando.Internals
 {
     class CommandInvoker
     {
-        public CommandInvoker(string command, Type type)
+        readonly Settings _settings;
+
+        public CommandInvoker(string command, Type type, Settings settings)
         {
+            _settings = settings;
+
             if (!typeof (ICommand).IsAssignableFrom(type))
             {
                 throw new ApplicationException($"Command tyep {type} does not implement {typeof(ICommand)} as it should!");
@@ -64,8 +68,8 @@ namespace GoCommando.Internals
             {
                 var switchesWithoutMathingParameterString = string.Join(Environment.NewLine,
                     switchesWithoutMathingParameter.Select(p => p.Value != null
-                        ? $"    {p.Key} = {p.Value}"
-                        : $"    {p.Key}"));
+                        ? $"    {_settings.SwitchPrefix}{p.Key} = {p.Value}"
+                        : $"    {_settings.SwitchPrefix}{p.Key}"));
 
                 throw new GoCommandoException($@"The following switches do not have a corresponding parameter:
 
