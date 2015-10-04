@@ -11,6 +11,9 @@ namespace GoCommando
     /// </summary>
     public static class Go
     {
+        /// <summary>
+        /// Call this method from your <code>Main</code> method
+        /// </summary>
         public static void Run()
         {
             try

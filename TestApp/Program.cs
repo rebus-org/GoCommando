@@ -2,9 +2,9 @@
 
 namespace TestApp
 {
-    [Banner(@"-----------------------
-Welcome to GoCommand v2
------------------------")]
+    [Banner(@"------------------------
+Welcome to GoCommando v2
+------------------------")]
     class Program
     {
         static void Main()

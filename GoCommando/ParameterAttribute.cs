@@ -2,6 +2,9 @@
 
 namespace GoCommando
 {
+    /// <summary>
+    /// Apply this attribute to a property of a command class (i.e. one that implements <see cref="ICommand"/>)
+    /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class ParameterAttribute : Attribute
     {
