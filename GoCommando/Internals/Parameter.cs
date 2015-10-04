@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace GoCommando.Internals
@@ -9,14 +11,21 @@ namespace GoCommando.Internals
         public string Name { get; }
         public string Shortname { get; }
         public bool Optional { get; }
+        public string DescriptionText { get; }
+        public string[] ExampleValues { get; }
 
-        public Parameter(PropertyInfo propertyInfo, string name, string shortname, bool optional)
+        public bool IsFlag => PropertyInfo.PropertyType == typeof (bool);
+
+        public Parameter(PropertyInfo propertyInfo, string name, string shortname, bool optional, string descriptionText, IEnumerable<string> exampleValues)
         {
             PropertyInfo = propertyInfo;
             Name = name;
             Shortname = shortname;
             Optional = optional;
+            DescriptionText = descriptionText;
+            ExampleValues = exampleValues.ToArray();
         }
+
 
         public bool MatchesKey(string key)
         {

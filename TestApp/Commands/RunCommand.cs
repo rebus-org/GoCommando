@@ -6,16 +6,21 @@ namespace TestApp.Commands
     [Command("run")]
     public class RunCommand : ICommand
     {
-        [Parameter("path")]
+        [Description("Specifies the path with which stuff is to be done")]
+        [Parameter("path", shortName: "p")]
+        [Example(@"c:\temp\somefile.json")]
         public string Path { get; set; }
 
         [Parameter("dir")]
+        [Example(@"C:\temp")]
+        [Example(@"C:\windows\microsoft.net")]
+        [Example(@"C:\windows\system32")]
         public string Dir { get; set; }
 
         [Parameter("flag")]
         public bool Flag { get; set; }
 
-        [Parameter("moreflag")]
+        [Parameter("moreflag", shortName: "m")]
         public bool MoreFlag { get; set; }
 
         [Parameter("optionalFlag", optional: true)]

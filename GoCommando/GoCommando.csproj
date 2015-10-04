@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DescriptionAttribute.cs" />
+    <Compile Include="ExampleAttribute.cs" />
+    <Compile Include="ExitCodeException.cs" />
     <Compile Include="ICommand.cs" />
     <Compile Include="Internals\Arguments.cs" />
     <Compile Include="BannerAttribute.cs" />

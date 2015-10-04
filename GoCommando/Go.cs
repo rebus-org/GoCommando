@@ -32,12 +32,31 @@ namespace GoCommando
             {
                 Environment.ExitCode = -1;
                 Console.WriteLine(friendlyException.Message);
+                Console.WriteLine();
+                Console.WriteLine("Invoke with -? or -help to get help.");
+                Console.WriteLine();
+                Console.WriteLine("Exit code: -1");
+                Console.WriteLine();
+            }
+            catch (CustomExitCodeException customExitCodeException)
+            {
+                FailAndExit(customExitCodeException, customExitCodeException.ExitCode);
             }
             catch (Exception exception)
             {
-                Environment.ExitCode = -2;
-                Console.Error.WriteLine(exception);
+                FailAndExit(exception, -2);
             }
+        }
+
+        static void FailAndExit(Exception customExitCodeException, int exitCode)
+        {
+            Console.WriteLine();
+            Console.Error.WriteLine(customExitCodeException);
+            Console.WriteLine();
+            Console.WriteLine("Exit code: {0}", exitCode);
+            Console.WriteLine();
+
+            Environment.ExitCode = exitCode;
         }
 
         static void InnerRun()
@@ -46,6 +65,63 @@ namespace GoCommando
             var settings = new Settings();
             var arguments = Parse(args, settings);
             var commandTypes = GetCommands(settings);
+
+            var helpSwitch = arguments.Switches.FirstOrDefault(s => s.Key == "?")
+                             ?? arguments.Switches.FirstOrDefault(s => s.Key == "help");
+
+            if (helpSwitch != null)
+            {
+                var exe = Assembly.GetEntryAssembly().GetName().Name + ".exe";
+
+                if (helpSwitch.Value != null)
+                {
+                    var command = commandTypes.FirstOrDefault(c => c.Command == helpSwitch.Value);
+
+                    if (command != null)
+                    {
+                        if (command.Parameters.Any())
+                        {
+                            Console.WriteLine(@"Type
+
+    {0} {1} <args>
+
+where <args> can consist of the following parameters:
+
+{2}", 
+exe, 
+command.Command,
+string.Join(Environment.NewLine, command.Parameters.Select(parameter => FormatParameter(parameter, settings))));
+                        }
+                        else
+                        {
+                            Console.WriteLine(@"Type
+
+    {0} {1}
+
+", exe, command.Command);
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Unknown command '{0}'", helpSwitch.Value);
+                    }
+                }
+
+                var availableCommands = string.Join(Environment.NewLine, commandTypes.Select(c => "    " + c.Command));
+
+                Console.WriteLine($@"The following commands are available:
+
+{availableCommands}
+
+Type
+
+    {exe} -help <command>
+
+to get help for a command.
+");
+                return;
+            }
 
             var commandToRun = commandTypes.FirstOrDefault(c => c.Command == arguments.Command);
 
@@ -59,6 +135,52 @@ namespace GoCommando
             }
 
             commandToRun.Invoke(arguments.Switches);
+        }
+
+        static string FormatParameter(Parameter parameter, Settings settings)
+        {
+            var shorthand = parameter.Shortname != null
+                ? $" / {settings.SwitchPrefix}{parameter.Shortname}"
+                : "";
+
+            var additionalProperties = new List<string>();
+
+            var isFlag = parameter.IsFlag;
+
+            if (isFlag)
+            {
+                additionalProperties.Add("flag");
+            }
+
+            if (parameter.Optional)
+            {
+                additionalProperties.Add("optional");
+            }
+
+            var additionalPropertiesText = additionalProperties.Any() ? $" ({string.Join("/", additionalProperties)})" : "";
+
+            var helpText = parameter.DescriptionText ?? "";
+
+            var examplesText = !parameter.ExampleValues.Any()
+                ? ""
+                : FormatExamples(parameter, settings);
+
+            return $@"    {settings.SwitchPrefix}{parameter.Name}{shorthand}{additionalPropertiesText}
+
+{helpText}
+{examplesText}
+";
+        }
+
+        static string FormatExamples(Parameter parameter, Settings settings)
+        {
+            var examples = string.Join(Environment.NewLine, parameter.ExampleValues
+                .Select(e => $"    {settings.SwitchPrefix}{parameter.Name} {e}"));
+
+            return $@"
+Examples:
+
+{examples}";
         }
 
         internal static List<CommandInvoker> GetCommands(Settings settings)
@@ -77,18 +199,30 @@ namespace GoCommando
         internal static Arguments Parse(IEnumerable<string> args, Settings settings)
         {
             var list = args.ToList();
-            var command = list.First();
 
-            if (command.StartsWith(settings.SwitchPrefix))
+            if (!list.Any()) return new Arguments(null, Enumerable.Empty<Switch>(), settings);
+
+            var first = list.First();
+
+            string command;
+            List<string> switchArgs;
+
+            if (first.StartsWith(settings.SwitchPrefix))
             {
-                throw new GoCommandoException($"Invalid command: '{command}' - the command must not start with the switch prefix '{settings.SwitchPrefix}'");
+                command = null;
+                switchArgs = list;
+            }
+            else
+            {
+                command = first;
+                switchArgs = list.Skip(1).ToList();
             }
 
             var switches = new List<Switch>();
 
             string key = null;
 
-            foreach (var arg in args.Skip(1))
+            foreach (var arg in switchArgs)
             {
                 if (arg.StartsWith(settings.SwitchPrefix))
                 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace GoCommando.Internals
 {
@@ -12,7 +13,7 @@ namespace GoCommando.Internals
         {
             _settings = settings;
 
-            if (!typeof (ICommand).IsAssignableFrom(type))
+            if (!typeof(ICommand).IsAssignableFrom(type))
             {
                 throw new ApplicationException($"Command tyep {type} does not implement {typeof(ICommand)} as it should!");
             }
@@ -29,13 +30,25 @@ namespace GoCommando.Internals
                 .Select(p => new
                 {
                     Property = p,
-                    Attribute = p.GetCustomAttributes(typeof (ParameterAttribute), false)
-                        .Cast<ParameterAttribute>()
-                        .FirstOrDefault()
+                    ParameterAttribute = GetSingleAttributeOrNull<ParameterAttribute>(p),
+                    DescriptionAttribute = GetSingleAttributeOrNull<DescriptionAttribute>(p),
+                    ExampleAttributes = p.GetCustomAttributes<ExampleAttribute>()
                 })
-                .Where(a => a.Attribute != null)
-                .Select(a => new Parameter(a.Property, a.Attribute.Name, a.Attribute.ShortName, a.Attribute.Optional))
+                .Where(a => a.ParameterAttribute != null)
+                .Select(a => new Parameter(a.Property,
+                    a.ParameterAttribute.Name,
+                    a.ParameterAttribute.ShortName,
+                    a.ParameterAttribute.Optional,
+                    a.DescriptionAttribute?.DescriptionText,
+                    a.ExampleAttributes.Select(e => e.ExampleValue)))
                 .ToList();
+        }
+
+        static TAttribute GetSingleAttributeOrNull<TAttribute>(PropertyInfo p) where TAttribute : Attribute
+        {
+            return p.GetCustomAttributes(typeof(TAttribute), false)
+                .Cast<TAttribute>()
+                .FirstOrDefault();
         }
 
         public string Command { get; }
