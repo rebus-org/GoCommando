@@ -4,6 +4,7 @@ using GoCommando;
 namespace TestApp.Commands
 {
     [Command("run")]
+    [Description("Runs the program")]
     public class RunCommand : ICommand
     {
         [Description("Specifies the path with which stuff is to be done")]

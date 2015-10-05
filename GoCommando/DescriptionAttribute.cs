@@ -6,7 +6,7 @@ namespace GoCommando
     /// Apply this attribute to a property of a command class (which is also decorated with <see cref="ParameterAttribute"/>) in
     /// order to provide a description of the parameter
     /// </summary>
-    [AttributeUsage(AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
     public class DescriptionAttribute : Attribute
     {
         public string DescriptionText { get; }

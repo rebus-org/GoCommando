@@ -55,6 +55,10 @@ namespace GoCommando.Internals
         public Type Type { get; }
         public IEnumerable<Parameter> Parameters { get; }
 
+        public string Description => Type.GetCustomAttribute<DescriptionAttribute>()?.DescriptionText ??
+                                     "(no help text for this command)";
+
+
         public void Invoke(IEnumerable<Switch> switches)
         {
             var commandInstance = (ICommand)Activator.CreateInstance(Type);

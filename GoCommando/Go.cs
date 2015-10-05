@@ -81,13 +81,16 @@ namespace GoCommando
                     {
                         if (command.Parameters.Any())
                         {
-                            Console.WriteLine(@"Type
+                            Console.WriteLine(@"{0}
 
-    {0} {1} <args>
+Type
+
+    {1} {2} <args>
 
 where <args> can consist of the following parameters:
 
-{2}", 
+{3}", 
+command.Description,
 exe, 
 command.Command,
 string.Join(Environment.NewLine, command.Parameters.Select(parameter => FormatParameter(parameter, settings))));
@@ -102,13 +105,11 @@ string.Join(Environment.NewLine, command.Parameters.Select(parameter => FormatPa
                         }
                         return;
                     }
-                    else
-                    {
-                        Console.WriteLine("Unknown command '{0}'", helpSwitch.Value);
-                    }
+
+                    throw new GoCommandoException($"Unknown command: '{helpSwitch.Value}'");
                 }
 
-                var availableCommands = string.Join(Environment.NewLine, commandTypes.Select(c => "    " + c.Command));
+                var availableCommands = string.Join(Environment.NewLine, commandTypes.Select(c => $"    {c.Command} - {c.Description}"));
 
                 Console.WriteLine($@"The following commands are available:
 
@@ -157,30 +158,32 @@ to get help for a command.
                 additionalProperties.Add("optional");
             }
 
-            var additionalPropertiesText = additionalProperties.Any() ? $" ({string.Join("/", additionalProperties)})" : "";
+            var additionalPropertiesText = additionalProperties.Any()
+                ? $" ({string.Join("/", additionalProperties)})"
+                : "";
 
-            var helpText = parameter.DescriptionText ?? "";
+            var helpText = "        " + (parameter.DescriptionText ?? "(no help text available)");
 
             var examplesText = !parameter.ExampleValues.Any()
                 ? ""
                 : FormatExamples(parameter, settings);
 
-            return $@"    {settings.SwitchPrefix}{parameter.Name}{shorthand}{additionalPropertiesText}
+            var switchText = $"{settings.SwitchPrefix}{parameter.Name}{shorthand}{additionalPropertiesText}";
 
+            return $@"    {switchText} 
 {helpText}
-{examplesText}
-";
+{examplesText}";
         }
 
         static string FormatExamples(Parameter parameter, Settings settings)
         {
             var examples = string.Join(Environment.NewLine, parameter.ExampleValues
-                .Select(e => $"    {settings.SwitchPrefix}{parameter.Name} {e}"));
+                .Select(e => $"          {settings.SwitchPrefix}{parameter.Name} {e}"));
 
             return $@"
-Examples:
-
-{examples}";
+        Examples:
+{examples}
+";
         }
 
         internal static List<CommandInvoker> GetCommands(Settings settings)
