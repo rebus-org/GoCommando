@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>GoCommando</id>
-    <version>1.0</version>
+    <version>0.90.0</version>
     <authors>Mogens Heller Grabe</authors>
     <owners>Mogens Heller Grabe</owners>
     <licenseUrl>http://en.wikipedia.org/wiki/Beerware</licenseUrl>
@@ -14,4 +14,8 @@
       <!--<dependency id="SampleDependency" version="1.0" />-->
     </dependencies>
   </metadata>
+  <files>
+    <file src="GoCommando\bin\Release\GoCommando.dll" target="lib\NET45" />
+    <file src="GoCommando\bin\Release\GoCommando.xml" target="lib\NET45" />
+  </files>
 </package>
