@@ -5,24 +5,28 @@ using System.Reflection;
 
 namespace GoCommando.Internals
 {
-    class Parameter
+    class Parameter : IEquatable<Parameter>
     {
         public PropertyInfo PropertyInfo { get; }
         public string Name { get; }
         public string Shortname { get; }
         public bool Optional { get; }
         public string DescriptionText { get; }
+        public string DefaultValue { get; }
         public string[] ExampleValues { get; }
 
         public bool IsFlag => PropertyInfo.PropertyType == typeof (bool);
 
-        public Parameter(PropertyInfo propertyInfo, string name, string shortname, bool optional, string descriptionText, IEnumerable<string> exampleValues)
+        public bool HasDefaultValue => DefaultValue != null;
+
+        public Parameter(PropertyInfo propertyInfo, string name, string shortname, bool optional, string descriptionText, IEnumerable<string> exampleValues, string defaultValue)
         {
             PropertyInfo = propertyInfo;
             Name = name;
             Shortname = shortname;
             Optional = optional;
             DescriptionText = descriptionText;
+            DefaultValue = defaultValue;
             ExampleValues = exampleValues.ToArray();
         }
 
@@ -47,6 +51,21 @@ namespace GoCommando.Internals
             {
                 throw new FormatException($"Could not set value '{value}' on property named '{PropertyInfo.Name}' on {PropertyInfo.DeclaringType}", exception);
             }
+        }
+
+        public void ApplyDefaultValue(ICommand commandInstance)
+        {
+            if (!HasDefaultValue)
+            {
+                throw new InvalidOperationException($"Cannot apply default value of '{Name}' parameter because it has no default!");
+            }
+
+            SetValue(commandInstance, DefaultValue);
+        }
+
+        public bool Equals(Parameter other)
+        {
+            return Name.Equals(other.Name);
         }
     }
 }

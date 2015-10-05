@@ -40,7 +40,8 @@ namespace GoCommando.Internals
                     a.ParameterAttribute.ShortName,
                     a.ParameterAttribute.Optional,
                     a.DescriptionAttribute?.DescriptionText,
-                    a.ExampleAttributes.Select(e => e.ExampleValue)))
+                    a.ExampleAttributes.Select(e => e.ExampleValue),
+                    a.ParameterAttribute.DefaultValue))
                 .ToList();
         }
 
@@ -64,13 +65,13 @@ namespace GoCommando.Internals
             var commandInstance = (ICommand)Activator.CreateInstance(Type);
 
             var requiredParametersMissing = Parameters
-                .Where(p => !p.Optional && !switches.Any(s => s.Key == p.Name))
+                .Where(p => !p.Optional && !p.HasDefaultValue && !switches.Any(s => s.Key == p.Name))
                 .ToList();
 
             if (requiredParametersMissing.Any())
             {
                 var requiredParametersMissingString = string.Join(Environment.NewLine,
-                    requiredParametersMissing.Select(p => "    " + p.Name));
+                    requiredParametersMissing.Select(p => $"    {_settings.SwitchPrefix}{p.Name}"));
 
                 throw new GoCommandoException($@"The following required parameters are missing:
 
@@ -93,11 +94,25 @@ namespace GoCommando.Internals
 {switchesWithoutMathingParameterString}");
             }
 
+            var setParameters = new HashSet<Parameter>();
+
             foreach (var switchToSet in switches)
             {
                 var correspondingParameter = Parameters.FirstOrDefault(p => p.MatchesKey(switchToSet.Key));
 
-                correspondingParameter?.SetValue(commandInstance, switchToSet.Value);
+                if (correspondingParameter == null)
+                {
+                    throw new GoCommandoException($"The switch {_settings}{switchToSet.Key} does not correspond to a parameter of the '{Command}' command!");
+                }
+
+                correspondingParameter.SetValue(commandInstance, switchToSet.Value);
+
+                setParameters.Add(correspondingParameter);
+            }
+
+            foreach (var parameterWithDefaultValue in Parameters.Where(p => p.HasDefaultValue).Except(setParameters))
+            {
+                parameterWithDefaultValue.ApplyDefaultValue(commandInstance);
             }
 
             commandInstance.Run();

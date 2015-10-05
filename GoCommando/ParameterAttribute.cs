@@ -11,12 +11,14 @@ namespace GoCommando
         public string Name { get; }
         public string ShortName { get; }
         public bool Optional { get; }
+        public string DefaultValue { get; }
 
-        public ParameterAttribute(string name, string shortName = null, bool optional = false)
+        public ParameterAttribute(string name, string shortName = null, bool optional = false, string defaultValue = null)
         {
             Name = name;
             ShortName = shortName;
             Optional = optional;
+            DefaultValue = defaultValue;
         }
     }
 }

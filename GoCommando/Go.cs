@@ -235,6 +235,18 @@ to get help for a command.
                     }
 
                     key = arg.Substring(settings.SwitchPrefix.Length);
+
+                    if (HasKeyAndValue(key))
+                    {
+                        var keyAndValue = GetKeyAndValueFromKey(key);
+                        if (keyAndValue == null)
+                        {
+                            throw new ApplicationException($"Expected to get key-value-pair from key '{key}'");
+                        }
+                        switches.Add(Switch.KeyValue(keyAndValue.Value.Key, keyAndValue.Value.Value));
+                        key = null;
+                    }
+
                     continue;
                 }
 
@@ -256,6 +268,36 @@ to get help for a command.
             }
 
             return new Arguments(command, switches, settings);
+        }
+
+        static bool HasKeyAndValue(string key)
+        {
+            return GetKeyAndValueFromKey(key) != null;
+        }
+
+        static KeyValuePair<string,string>? GetKeyAndValueFromKey(string key)
+        {
+            for (var index = 0; index < key.Length; index++)
+            {
+                var c = key[index];
+
+                if (c == ':')
+                {
+                    return new KeyValuePair<string, string>(key.Substring(0, index), key.Substring(index + 1));
+                }
+
+                if (c == '=')
+                {
+                    return new KeyValuePair<string, string>(key.Substring(0, index), key.Substring(index + 1));
+                }
+
+                if (!char.IsLetter(c))
+                {
+                    return new KeyValuePair<string, string>(key.Substring(0, index), key.Substring(index));
+                }
+            }
+
+            return null;
         }
     }
 }

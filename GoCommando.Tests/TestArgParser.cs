@@ -12,7 +12,7 @@ namespace GoCommando.Tests
         [Test]
         public void CanReturnSimpleCommand()
         {
-            var arguments = Parse(new[] {"run"});
+            var arguments = Parse(new[] { "run" });
 
             Assert.That(arguments.Command, Is.EqualTo("run"));
         }
@@ -22,7 +22,7 @@ namespace GoCommando.Tests
         {
             var ex = Assert.Throws<GoCommandoException>(() =>
             {
-                Parse(new[] {"-file", @"""C:\temp\file.json"""});
+                Parse(new[] { "-file", @"""C:\temp\file.json""" });
             });
 
             Console.WriteLine(ex);
@@ -37,7 +37,7 @@ c:\Program Files
 -dir
 c:\Windows\Microsoft.NET\Framework
 -flag
--moreflag".Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+-moreflag".Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
             var arguments = Parse(args);
 
@@ -51,6 +51,28 @@ c:\Windows\Microsoft.NET\Framework
             Assert.That(arguments.Get<bool>("flag"), Is.True);
             Assert.That(arguments.Get<bool>("moreflag"), Is.True);
             Assert.That(arguments.Get<bool>("flag_not_specified_should_default_to_false"), Is.False);
+        }
+
+        [TestCase(@"-path:""c:\temp""")]
+        [TestCase(@"-path=""c:\temp""")]
+        [TestCase(@"-path""c:\temp""")]
+        public void SupportsVariousSingleTokenAliases(string alias)
+        {
+            var arguments = Parse(new[] { alias });
+
+            Assert.That(arguments.Switches.Count(), Is.EqualTo(1));
+            Assert.That(arguments.Switches.Single().Key, Is.EqualTo("path"));
+            Assert.That(arguments.Switches.Single().Value, Is.EqualTo(@"""c:\temp"""));
+        }
+
+        [TestCase(@"-n23")]
+        public void SupportsShortFormWithNumber(string alias)
+        {
+            var arguments = Parse(new[] { alias });
+
+            Assert.That(arguments.Switches.Count(), Is.EqualTo(1));
+            Assert.That(arguments.Switches.Single().Key, Is.EqualTo("n"));
+            Assert.That(arguments.Switches.Single().Value, Is.EqualTo(@"23"));
         }
 
         static Arguments Parse(IEnumerable<string> args)
