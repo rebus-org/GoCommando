@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>GoCommando</id>
-    <version>0.90.0</version>
+    <version>$version$</version>
     <authors>Mogens Heller Grabe</authors>
     <owners>Mogens Heller Grabe</owners>
     <licenseUrl>http://en.wikipedia.org/wiki/Beerware</licenseUrl>
