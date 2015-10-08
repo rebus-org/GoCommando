@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\NewCommand.cs" />
     <Compile Include="Commands\RunCommand.cs" />
     <Compile Include="Commands\StopCommand.cs" />
     <Compile Include="Program.cs" />
