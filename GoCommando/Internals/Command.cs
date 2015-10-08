@@ -8,19 +8,25 @@ namespace GoCommando.Internals
     class CommandInvoker
     {
         readonly Settings _settings;
+        readonly ICommand _commandInstance;
 
         public CommandInvoker(string command, Type type, Settings settings)
+            : this(command, settings, CreateInstance(type))
+        {
+        }
+
+        public CommandInvoker(string command, Settings settings, ICommand commandInstance)
         {
             _settings = settings;
-
-            if (!typeof(ICommand).IsAssignableFrom(type))
-            {
-                throw new ApplicationException($"Command tyep {type} does not implement {typeof(ICommand)} as it should!");
-            }
+            _commandInstance = commandInstance;
 
             Command = command;
-            Type = type;
             Parameters = GetParameters(Type);
+        }
+
+        static ICommand CreateInstance(Type type)
+        {
+            return (ICommand)Activator.CreateInstance(type);
         }
 
         IEnumerable<Parameter> GetParameters(Type type)
@@ -53,16 +59,19 @@ namespace GoCommando.Internals
         }
 
         public string Command { get; }
-        public Type Type { get; }
+
+        public Type Type => _commandInstance.GetType();
+
         public IEnumerable<Parameter> Parameters { get; }
 
         public string Description => Type.GetCustomAttribute<DescriptionAttribute>()?.DescriptionText ??
                                      "(no help text for this command)";
 
+        public ICommand CommandInstance => _commandInstance;
 
         public void Invoke(IEnumerable<Switch> switches)
         {
-            var commandInstance = (ICommand)Activator.CreateInstance(Type);
+            var commandInstance = _commandInstance;
 
             var requiredParametersMissing = Parameters
                 .Where(p => !p.Optional && !p.HasDefaultValue && !switches.Any(s => s.Key == p.Name))

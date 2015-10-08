@@ -33,7 +33,7 @@ namespace GoCommando
                 Environment.ExitCode = -1;
                 Console.WriteLine(friendlyException.Message);
                 Console.WriteLine();
-                Console.WriteLine("Invoke with -? or -help to get help.");
+                Console.WriteLine("Invoke with -help <command> to get help for each command.");
                 Console.WriteLine();
                 Console.WriteLine("Exit code: -1");
                 Console.WriteLine();
@@ -128,9 +128,13 @@ to get help for a command.
 
             if (commandToRun == null)
             {
-                var availableCommands = string.Join(Environment.NewLine, commandTypes.Select(c => "    " + c.Command));
+                var errorText = !string.IsNullOrWhiteSpace(arguments.Command)
+                    ? $"Could not find command '{arguments.Command}'"
+                    : "Please invoke with a command";
 
-                throw new GoCommandoException($@"Could not find command '{arguments.Command}' - the following commands are available:
+                var availableCommands = string.Join(Environment.NewLine, commandTypes.Select(c => $"    {c.Command} - {c.Description}"));
+
+                throw new GoCommandoException($@"{errorText} - the following commands are available:
 
 {availableCommands}");
             }

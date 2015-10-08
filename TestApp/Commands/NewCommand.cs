@@ -4,6 +4,7 @@ using GoCommando;
 namespace TestApp.Commands
 {
     [Command("new")]
+    [Description("Does something new")]
     public class NewCommand : ICommand
     {
         [Parameter("qid")]
