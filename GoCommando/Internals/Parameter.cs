@@ -25,7 +25,7 @@ namespace GoCommando.Internals
             Name = name;
             Shortname = shortname;
             Optional = optional;
-            DescriptionText = descriptionText;
+            DescriptionText = descriptionText ?? "(no description given)";
             DefaultValue = defaultValue;
             ExampleValues = exampleValues.ToArray();
         }

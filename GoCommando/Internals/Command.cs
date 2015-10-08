@@ -80,7 +80,7 @@ namespace GoCommando.Internals
             if (requiredParametersMissing.Any())
             {
                 var requiredParametersMissingString = string.Join(Environment.NewLine,
-                    requiredParametersMissing.Select(p => $"    {_settings.SwitchPrefix}{p.Name}"));
+                    requiredParametersMissing.Select(p => $"    {_settings.SwitchPrefix}{p.Name} - {p.DescriptionText}"));
 
                 throw new GoCommandoException($@"The following required parameters are missing:
 
