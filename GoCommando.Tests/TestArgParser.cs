@@ -18,6 +18,14 @@ namespace GoCommando.Tests
         }
 
         [Test]
+        public void CommandIsNullWhenNoCommandIsGiven()
+        {
+            var arguments = Parse(new[] { "-file", @"""C:\temp\file.json""" });
+
+            Assert.That(arguments.Command, Is.Null);
+        }
+
+        [Test, Ignore("arguments.Command should just be null")]
         public void DoesNotAcceptSwitchAsCommand()
         {
             var ex = Assert.Throws<GoCommandoException>(() =>
@@ -62,7 +70,7 @@ c:\Windows\Microsoft.NET\Framework
 
             Assert.That(arguments.Switches.Count(), Is.EqualTo(1));
             Assert.That(arguments.Switches.Single().Key, Is.EqualTo("path"));
-            Assert.That(arguments.Switches.Single().Value, Is.EqualTo(@"""c:\temp"""));
+            Assert.That(arguments.Switches.Single().Value, Is.EqualTo(@"c:\temp"));
         }
 
         [TestCase(@"-n23")]

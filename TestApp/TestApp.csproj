@@ -46,6 +46,7 @@
     <Compile Include="Commands\NewCommand.cs" />
     <Compile Include="Commands\RunCommand.cs" />
     <Compile Include="Commands\StopCommand.cs" />
+    <Compile Include="Commands\TestAppConfigBinding.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

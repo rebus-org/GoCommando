@@ -26,7 +26,21 @@ namespace GoCommando.Internals
 
         static ICommand CreateInstance(Type type)
         {
-            return (ICommand)Activator.CreateInstance(type);
+            try
+            {
+                var instance = Activator.CreateInstance(type);
+
+                if (!(instance is ICommand))
+                {
+                    throw new ApplicationException($"{instance} does not implement ICommand!");
+                }
+
+                return (ICommand)instance;
+            }
+            catch (Exception exception)
+            {
+                throw new ApplicationException($"Could not use type {type} as a GoCommando command", exception);
+            }
         }
 
         IEnumerable<Parameter> GetParameters(Type type)
@@ -47,7 +61,9 @@ namespace GoCommando.Internals
                     a.ParameterAttribute.Optional,
                     a.DescriptionAttribute?.DescriptionText,
                     a.ExampleAttributes.Select(e => e.ExampleValue),
-                    a.ParameterAttribute.DefaultValue))
+                    a.ParameterAttribute.DefaultValue,
+                    a.ParameterAttribute.AllowAppSetting,
+                    a.ParameterAttribute.AllowConnectionString))
                 .ToList();
         }
 
@@ -69,12 +85,15 @@ namespace GoCommando.Internals
 
         public ICommand CommandInstance => _commandInstance;
 
-        public void Invoke(IEnumerable<Switch> switches)
+        public void Invoke(IEnumerable<Switch> switches, EnvironmentSettings environmentSettings)
         {
             var commandInstance = _commandInstance;
 
             var requiredParametersMissing = Parameters
-                .Where(p => !p.Optional && !p.HasDefaultValue && !switches.Any(s => s.Key == p.Name))
+                .Where(p => !p.Optional
+                            && !p.HasDefaultValue
+                            && !CanBeResolvedFromSwitches(switches, p)
+                            && !CanBeResolvedFromEnvironmentSettings(environmentSettings, p))
                 .ToList();
 
             if (requiredParametersMissing.Any())
@@ -105,26 +124,88 @@ namespace GoCommando.Internals
 
             var setParameters = new HashSet<Parameter>();
 
+            ResolveParametersFromSwitches(switches, commandInstance, setParameters);
+
+            ResolveParametersFromEnvironmentSettings(environmentSettings, commandInstance, setParameters, Parameters);
+
+            ResolveParametersWithDefaultValues(setParameters, commandInstance);
+
+            commandInstance.Run();
+        }
+
+        void ResolveParametersFromEnvironmentSettings(EnvironmentSettings environmentSettings, ICommand commandInstance, HashSet<Parameter> setParameters, IEnumerable<Parameter> parameters)
+        {
+            foreach (var parameter in parameters.Where(p => p.AllowAppSetting && !setParameters.Contains(p)))
+            {
+                if (!environmentSettings.HasAppSetting(parameter.Name)) continue;
+
+                var appSettingValue = environmentSettings.GetAppSetting(parameter.Name);
+
+                SetParameter(commandInstance, setParameters, parameter, appSettingValue);
+            }
+
+            foreach (var parameter in parameters.Where(p => p.AllowConnectionString && !setParameters.Contains(p)))
+            {
+                if (!environmentSettings.HasConnectionString(parameter.Name)) continue;
+
+                var appSettingValue = environmentSettings.GetConnectionString(parameter.Name);
+
+                SetParameter(commandInstance, setParameters, parameter, appSettingValue);
+            }
+        }
+
+        void ResolveParametersWithDefaultValues(HashSet<Parameter> setParameters, ICommand commandInstance)
+        {
+            foreach (var parameterWithDefaultValue in Parameters.Where(p => p.HasDefaultValue).Except(setParameters))
+            {
+                parameterWithDefaultValue.ApplyDefaultValue(commandInstance);
+            }
+        }
+
+        void ResolveParametersFromSwitches(IEnumerable<Switch> switches, ICommand commandInstance, HashSet<Parameter> setParameters)
+        {
             foreach (var switchToSet in switches)
             {
                 var correspondingParameter = Parameters.FirstOrDefault(p => p.MatchesKey(switchToSet.Key));
 
                 if (correspondingParameter == null)
                 {
-                    throw new GoCommandoException($"The switch {_settings}{switchToSet.Key} does not correspond to a parameter of the '{Command}' command!");
+                    throw new GoCommandoException(
+                        $"The switch {_settings}{switchToSet.Key} does not correspond to a parameter of the '{Command}' command!");
                 }
 
-                correspondingParameter.SetValue(commandInstance, switchToSet.Value);
+                var value = switchToSet.Value;
 
-                setParameters.Add(correspondingParameter);
+                SetParameter(commandInstance, setParameters, correspondingParameter, value);
             }
+        }
 
-            foreach (var parameterWithDefaultValue in Parameters.Where(p => p.HasDefaultValue).Except(setParameters))
+        static void SetParameter(ICommand commandInstance, ISet<Parameter> setParameters, Parameter parameter, string value)
+        {
+            parameter.SetValue(commandInstance, value);
+            setParameters.Add(parameter);
+        }
+
+        static bool CanBeResolvedFromEnvironmentSettings(EnvironmentSettings environmentSettings, Parameter parameter)
+        {
+            var name = parameter.Name;
+
+            if (parameter.AllowAppSetting && environmentSettings.HasAppSetting(name))
             {
-                parameterWithDefaultValue.ApplyDefaultValue(commandInstance);
+                return true;
             }
 
-            commandInstance.Run();
+            if (parameter.AllowConnectionString && environmentSettings.HasConnectionString(name))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        static bool CanBeResolvedFromSwitches(IEnumerable<Switch> switches, Parameter p)
+        {
+            return switches.Any(s => s.Key == p.Name);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using GoCommando.Internals;
@@ -139,7 +140,25 @@ to get help for a command.
 {availableCommands}");
             }
 
-            commandToRun.Invoke(arguments.Switches);
+            var appSettings = ConfigurationManager.AppSettings.AllKeys
+                .Select(key => new
+                {
+                    Key = key,
+                    Value = ConfigurationManager.AppSettings[key]
+                })
+                .ToDictionary(a => a.Key, a => a.Value);
+
+            var connectionStrings = ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>()
+                .Select(c => new
+                {
+                    Key = c.Name,
+                    Value = c.ConnectionString
+                })
+                .ToDictionary(a => a.Key, a => a.Value);
+
+            var environmentSettings = new EnvironmentSettings(appSettings, connectionStrings);
+
+            commandToRun.Invoke(arguments.Switches, environmentSettings);
         }
 
         static string FormatParameter(Parameter parameter, Settings settings)

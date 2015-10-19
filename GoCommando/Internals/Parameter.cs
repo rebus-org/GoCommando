@@ -13,13 +13,15 @@ namespace GoCommando.Internals
         public bool Optional { get; }
         public string DescriptionText { get; }
         public string DefaultValue { get; }
+        public bool AllowAppSetting { get; }
+        public bool AllowConnectionString { get; }
         public string[] ExampleValues { get; }
 
-        public bool IsFlag => PropertyInfo.PropertyType == typeof (bool);
+        public bool IsFlag => PropertyInfo.PropertyType == typeof(bool);
 
         public bool HasDefaultValue => DefaultValue != null;
 
-        public Parameter(PropertyInfo propertyInfo, string name, string shortname, bool optional, string descriptionText, IEnumerable<string> exampleValues, string defaultValue)
+        public Parameter(PropertyInfo propertyInfo, string name, string shortname, bool optional, string descriptionText, IEnumerable<string> exampleValues, string defaultValue, bool allowAppSetting, bool allowConnectionString)
         {
             PropertyInfo = propertyInfo;
             Name = name;
@@ -27,6 +29,8 @@ namespace GoCommando.Internals
             Optional = optional;
             DescriptionText = descriptionText ?? "(no description given)";
             DefaultValue = defaultValue;
+            AllowAppSetting = allowAppSetting;
+            AllowConnectionString = allowConnectionString;
             ExampleValues = exampleValues.ToArray();
         }
 
@@ -41,7 +45,7 @@ namespace GoCommando.Internals
         {
             try
             {
-                var valueInTheRightType = PropertyInfo.PropertyType == typeof (bool)
+                var valueInTheRightType = PropertyInfo.PropertyType == typeof(bool)
                     ? true
                     : Convert.ChangeType(value, PropertyInfo.PropertyType);
 

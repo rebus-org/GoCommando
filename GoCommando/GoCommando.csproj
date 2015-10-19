@@ -35,6 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -54,6 +55,7 @@
     <Compile Include="Go.cs" />
     <Compile Include="GoCommandoException.cs" />
     <Compile Include="Internals\Command.cs" />
+    <Compile Include="Internals\EnvironmentSettings.cs" />
     <Compile Include="Internals\Parameter.cs" />
     <Compile Include="Internals\StringExtensions.cs" />
     <Compile Include="ParameterAttribute.cs" />
