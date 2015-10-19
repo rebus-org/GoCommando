@@ -12,6 +12,13 @@ How?
 
 Create a new console application. `Install-Package GoCommando` to get the DLL, and then `Go.Run()` in the `Main` method.
 
+And then you add some classes that implement `ICommand` and you decorate them with `[Command]` and
+then you add properties to those classes, and then you decorate those with `[Parameter]`.
+
+And then you decorate the command class and the parameter properties with `[Description]`.
+
+And then you add a couple of `[Example]` to some of the parameter properties, just to be nice.
+
 License
 ====
 
