@@ -50,12 +50,18 @@ namespace GoCommando.Tests
                 {"my-conn", "my-value"}
             };
 
-            invoker.Invoke(Enumerable.Empty<Switch>(), new EnvironmentSettings(appSettings, connectionStrings));
+            var environmentVariables = new Dictionary<string, string>
+            {
+                {"my-env", "my-value"}
+            };
+
+            invoker.Invoke(Enumerable.Empty<Switch>(), new EnvironmentSettings(appSettings, connectionStrings, environmentVariables));
 
             var instance = (CanUseAppSetting) invoker.CommandInstance;
 
             Assert.That(instance.AppSetting, Is.EqualTo("my-value"));
             Assert.That(instance.ConnectionString, Is.EqualTo("my-value"));
+            Assert.That(instance.EnvironmentVariable, Is.EqualTo("my-value"));
         }
 
         class CanUseAppSetting : ICommand
@@ -65,6 +71,9 @@ namespace GoCommando.Tests
 
             [Parameter("my-conn", allowConnectionString: true)]
             public string ConnectionString { get; set; }
+
+            [Parameter("my-env", allowEnvironmentVariable: true)]
+            public string EnvironmentVariable { get; set; }
 
             public void Run()
             {

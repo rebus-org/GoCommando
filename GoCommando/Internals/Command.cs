@@ -63,7 +63,8 @@ namespace GoCommando.Internals
                     a.ExampleAttributes.Select(e => e.ExampleValue),
                     a.ParameterAttribute.DefaultValue,
                     a.ParameterAttribute.AllowAppSetting,
-                    a.ParameterAttribute.AllowConnectionString))
+                    a.ParameterAttribute.AllowConnectionString,
+                    a.ParameterAttribute.AllowEnvironmentVariable))
                 .ToList();
         }
 
@@ -152,6 +153,15 @@ namespace GoCommando.Internals
 
                 SetParameter(commandInstance, setParameters, parameter, appSettingValue);
             }
+
+            foreach (var parameter in parameters.Where(p => p.AllowEnvironmentVariable && !setParameters.Contains(p)))
+            {
+                if (!environmentSettings.HasEnvironmentVariable(parameter.Name)) continue;
+
+                var appSettingValue = environmentSettings.GetEnvironmentVariable(parameter.Name);
+
+                SetParameter(commandInstance, setParameters, parameter, appSettingValue);
+            }
         }
 
         void ResolveParametersWithDefaultValues(HashSet<Parameter> setParameters, ICommand commandInstance)
@@ -196,6 +206,11 @@ namespace GoCommando.Internals
             }
 
             if (parameter.AllowConnectionString && environmentSettings.HasConnectionString(name))
+            {
+                return true;
+            }
+
+            if (parameter.AllowEnvironmentVariable && environmentSettings.HasEnvironmentVariable(name))
             {
                 return true;
             }

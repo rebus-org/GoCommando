@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -149,14 +150,13 @@ to get help for a command.
                 .ToDictionary(a => a.Key, a => a.Value);
 
             var connectionStrings = ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>()
-                .Select(c => new
-                {
-                    Key = c.Name,
-                    Value = c.ConnectionString
-                })
-                .ToDictionary(a => a.Key, a => a.Value);
+                .ToDictionary(a => a.Name, a => a.ConnectionString);
 
-            var environmentSettings = new EnvironmentSettings(appSettings, connectionStrings);
+            var environmentVariables = Environment.GetEnvironmentVariables()
+                .Cast<DictionaryEntry>()
+                .ToDictionary(a => (string)a.Key, a => (string)a.Value);
+
+            var environmentSettings = new EnvironmentSettings(appSettings, connectionStrings, environmentVariables);
 
             commandToRun.Invoke(arguments.Switches, environmentSettings);
         }

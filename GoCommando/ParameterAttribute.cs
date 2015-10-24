@@ -41,6 +41,12 @@ namespace GoCommando
         public bool AllowConnectionString { get; }
 
         /// <summary>
+        /// Gets whether this parameter can have its value resolved from an environment variable with the same name as specified by <see cref="Name"/>
+        /// If the value is provided with a command-line switch, the provided value takes precedence.
+        /// </summary>
+        public bool AllowEnvironmentVariable { get; }
+
+        /// <summary>
         /// Constructs the parameter attribute
         /// </summary>
         /// <param name="name">Primary name of the parameter</param>
@@ -55,7 +61,11 @@ namespace GoCommando
         /// Indicates whether parameter value resolution can go and look in the <code>&lt;connectionStrings&gt;</code> section of
         /// the current application configuration file for a value. Will look for the name specified by <paramref name="name"/>
         /// </param>
-        public ParameterAttribute(string name, string shortName = null, bool optional = false, string defaultValue = null, bool allowAppSetting = false, bool allowConnectionString = false)
+        /// <param name="allowEnvironmentVariable">
+        /// Indicates whether parameter value resolution can go and look for an environment variable for a value.
+        /// Will look for the name specified by <paramref name="name"/>
+        /// </param>
+        public ParameterAttribute(string name, string shortName = null, bool optional = false, string defaultValue = null, bool allowAppSetting = false, bool allowConnectionString = false, bool allowEnvironmentVariable = false)
         {
             Name = name;
             ShortName = shortName;
@@ -63,6 +73,7 @@ namespace GoCommando
             DefaultValue = defaultValue;
             AllowAppSetting = allowAppSetting;
             AllowConnectionString = allowConnectionString;
+            AllowEnvironmentVariable = allowEnvironmentVariable;
         }
     }
 }

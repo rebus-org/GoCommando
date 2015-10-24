@@ -14,11 +14,17 @@ namespace TestApp.Commands
         [Description("Demonstrates how a connectionString can be automatically bound")]
         public string ConnectionString { get; set; }
 
+        [Parameter("windir", allowEnvironmentVariable: true)]
+        [Description("Demonstrates how an environment variable can be automatically bound")]
+        public string EnvironmentVariable { get; set; }
+
         public void Run()
         {
             Console.WriteLine($@"AppSetting: {AppSetting}
 
-ConnectionString: {ConnectionString}");
+ConnectionString: {ConnectionString}
+
+EnvironmentVariable: {EnvironmentVariable}");
         }
     }
 }
