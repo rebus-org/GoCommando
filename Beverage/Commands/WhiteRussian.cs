@@ -21,7 +21,9 @@ namespace Beverage.Commands
 
         public void Run()
         {
-            Console.WriteLine($"Making a {(LukeWarm ? "luke-warm" : "")} beverage with {Vodka:0.#} cl of vodka and {Kahlua:0.#} cl of Kahlua");
+            Console.WriteLine($"Making a {(LukeWarm ? "luke-warm" : "")} beverage" +
+                                $" with {Vodka:0.#} cl of vodka" +
+                                $" and {Kahlua:0.#} cl of Kahlua");
         }
     }
 }
