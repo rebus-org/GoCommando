@@ -14,11 +14,18 @@ namespace GoCommando
         public string Command { get; }
 
         /// <summary>
+        /// Gets the name of the command's group (if any). Grouping commands affects how they are presented when printing
+        /// help texts
+        /// </summary>
+        public string Group { get; }
+
+        /// <summary>
         /// Constructs the attribute
         /// </summary>
-        public CommandAttribute(string command)
+        public CommandAttribute(string command, string group = null)
         {
             Command = command;
+            Group = group ?? "";
         }
     }
 }

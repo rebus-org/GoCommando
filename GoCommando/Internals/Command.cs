@@ -10,17 +10,18 @@ namespace GoCommando.Internals
         readonly Settings _settings;
         readonly ICommand _commandInstance;
 
-        public CommandInvoker(string command, Type type, Settings settings)
-            : this(command, settings, CreateInstance(type))
+        public CommandInvoker(string command, Type type, Settings settings, string group = null)
+            : this(command, settings, CreateInstance(type), group)
         {
         }
 
-        public CommandInvoker(string command, Settings settings, ICommand commandInstance)
+        public CommandInvoker(string command, Settings settings, ICommand commandInstance, string group = null)
         {
             _settings = settings;
             _commandInstance = commandInstance;
 
             Command = command;
+            Group = group;
             Parameters = GetParameters(Type);
         }
 
@@ -43,7 +44,7 @@ namespace GoCommando.Internals
             }
         }
 
-        IEnumerable<Parameter> GetParameters(Type type)
+        static IEnumerable<Parameter> GetParameters(Type type)
         {
             return type
                 .GetProperties()
@@ -74,6 +75,8 @@ namespace GoCommando.Internals
                 .Cast<TAttribute>()
                 .FirstOrDefault();
         }
+
+        public string Group { get; }
 
         public string Command { get; }
 

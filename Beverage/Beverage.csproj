@@ -43,6 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\BlackRussian.cs" />
+    <Compile Include="Commands\Martini.cs" />
     <Compile Include="Commands\WhiteRussian.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

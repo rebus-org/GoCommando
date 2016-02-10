@@ -111,7 +111,7 @@ string.Join(Environment.NewLine, command.Parameters.Select(parameter => FormatPa
                     throw new GoCommandoException($"Unknown command: '{helpSwitch.Value}'");
                 }
 
-                var availableCommands = string.Join(Environment.NewLine, commandTypes.Select(c => $"    {c.Command} - {c.Description}"));
+                var availableCommands = GetAvailableCommandsHelpText(commandTypes);
 
                 Console.WriteLine($@"The following commands are available:
 
@@ -134,7 +134,7 @@ to get help for a command.
                     ? $"Could not find command '{arguments.Command}'"
                     : "Please invoke with a command";
 
-                var availableCommands = string.Join(Environment.NewLine, commandTypes.Select(c => $"    {c.Command} - {c.Description}"));
+                var availableCommands = GetAvailableCommandsHelpText(commandTypes);
 
                 throw new GoCommandoException($@"{errorText} - the following commands are available:
 
@@ -159,6 +159,25 @@ to get help for a command.
             var environmentSettings = new EnvironmentSettings(appSettings, connectionStrings, environmentVariables);
 
             commandToRun.Invoke(arguments.Switches, environmentSettings);
+        }
+
+        static string GetAvailableCommandsHelpText(List<CommandInvoker> commandTypes)
+        {
+            var commandGroups = commandTypes
+                .GroupBy(c => c.Group)
+                .ToList();
+
+            if (commandGroups.Count == 1)
+            {
+                return string.Join(Environment.NewLine, commandTypes.Select(c => $"    {c.Command} - {c.Description}"));
+            }
+
+            return string.Join(Environment.NewLine + Environment.NewLine,
+                commandGroups
+                .Select(g => $@"    {g.Key}:
+
+{string.Join(Environment.NewLine, g.Select(c => $"      {c.Command} - {c.Description}"))}"));
+                
         }
 
         static string FormatParameter(Parameter parameter, Settings settings)
@@ -211,14 +230,34 @@ to get help for a command.
 
         internal static List<CommandInvoker> GetCommands(Settings settings)
         {
-            return Assembly.GetEntryAssembly().GetTypes()
+            var commandAttributes = Assembly.GetEntryAssembly().GetTypes()
                 .Select(t => new
                 {
                     Type = t,
                     Attribute = t.GetCustomAttribute<CommandAttribute>()
                 })
                 .Where(a => a.Attribute != null)
-                .Select(a => new CommandInvoker(a.Attribute.Command, a.Type, settings))
+                .GroupBy(a => a.Attribute.Command)
+                .ToList();
+
+            var duplicateCommands = commandAttributes
+                .Where(g => g.Count() > 1)
+                .ToList();
+
+            if (duplicateCommands.Any())
+            {
+                throw new GoCommandoException($@"The following commands are duplicates:
+
+{string.Join(Environment.NewLine, duplicateCommands.SelectMany(g => g.Select(a => $"    {a.Attribute.Command}: {a.Type}")))}");
+            }
+
+            return commandAttributes
+                .Select(g =>
+                {
+                    var a = g.First();
+
+                    return new CommandInvoker(a.Attribute.Command, a.Type, settings, a.Attribute.Group);
+                })
                 .ToList();
         }
 
