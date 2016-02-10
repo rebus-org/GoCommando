@@ -8,8 +8,14 @@ namespace GoCommando
     [AttributeUsage(AttributeTargets.Class)]
     public class BannerAttribute : Attribute
     {
+        /// <summary>
+        /// Gets the banner text
+        /// </summary>
         public string BannerText { get; }
 
+        /// <summary>
+        /// Constructs the attribute
+        /// </summary>
         public BannerAttribute(string bannerText)
         {
             BannerText = bannerText;

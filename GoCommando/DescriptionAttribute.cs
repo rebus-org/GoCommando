@@ -9,8 +9,14 @@ namespace GoCommando
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
     public class DescriptionAttribute : Attribute
     {
+        /// <summary>
+        /// Gets the description text
+        /// </summary>
         public string DescriptionText { get; }
 
+        /// <summary>
+        /// Constructs the attribute
+        /// </summary>
         public DescriptionAttribute(string descriptionText)
         {
             DescriptionText = descriptionText;

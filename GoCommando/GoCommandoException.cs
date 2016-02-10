@@ -10,10 +10,16 @@ namespace GoCommando
     [Serializable]
     public class GoCommandoException : Exception
     {
+        /// <summary>
+        /// Constructs the exception
+        /// </summary>
         protected GoCommandoException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
 
+        /// <summary>
+        /// Constructs the exception
+        /// </summary>
         public GoCommandoException(string message) : base(message)
         {
         }

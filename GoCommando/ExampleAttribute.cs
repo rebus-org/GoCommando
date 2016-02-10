@@ -8,8 +8,14 @@ namespace GoCommando
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
     public class ExampleAttribute : Attribute
     {
+        /// <summary>
+        /// Gets the example text
+        /// </summary>
         public string ExampleValue { get; }
 
+        /// <summary>
+        /// Constructs the attribute
+        /// </summary>
         public ExampleAttribute(string exampleValue)
         {
             ExampleValue = exampleValue;

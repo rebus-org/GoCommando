@@ -5,6 +5,9 @@
     /// </summary>
     public interface ICommand
     {
+        /// <summary>
+        /// Main run method that is invoked by GoCommando
+        /// </summary>
         void Run();
     }
 }
