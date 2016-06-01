@@ -4,16 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2839AA55-B40A-4BB8-BDA0-C5057E5A683F}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{07010B53-B1CB-4696-8BB4-DCA2943B6B59}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GoCommando</RootNamespace>
-    <AssemblyName>GoCommando</AssemblyName>
+    <RootNamespace>TestApp2</RootNamespace>
+    <AssemblyName>TestApp2</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -21,21 +21,18 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\GoCommando.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -45,24 +42,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DescriptionAttribute.cs" />
-    <Compile Include="ExampleAttribute.cs" />
-    <Compile Include="ExitCodeException.cs" />
-    <Compile Include="ICommand.cs" />
-    <Compile Include="ICommandFactory.cs" />
-    <Compile Include="Internals\Arguments.cs" />
-    <Compile Include="BannerAttribute.cs" />
-    <Compile Include="CommandAttribute.cs" />
-    <Compile Include="Go.cs" />
-    <Compile Include="GoCommandoException.cs" />
-    <Compile Include="Internals\CommandInvoker.cs" />
-    <Compile Include="Internals\EnvironmentSettings.cs" />
-    <Compile Include="Internals\Parameter.cs" />
-    <Compile Include="Internals\StringExtensions.cs" />
-    <Compile Include="ParameterAttribute.cs" />
+    <Compile Include="ElCommandante.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Internals\Settings.cs" />
-    <Compile Include="Internals\Switch.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GoCommando\GoCommando.csproj">
+      <Project>{2839AA55-B40A-4BB8-BDA0-C5057E5A683F}</Project>
+      <Name>GoCommando</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

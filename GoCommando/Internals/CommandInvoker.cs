@@ -9,27 +9,55 @@ namespace GoCommando.Internals
     {
         readonly Settings _settings;
         readonly ICommand _commandInstance;
+        readonly Action<ICommand> _releaser;
 
-        public CommandInvoker(string command, Type type, Settings settings, string group = null)
-            : this(command, settings, CreateInstance(type), group)
+        public CommandInvoker(string command, Type type, Settings settings, string group = null, ICommandFactory commandFactory = null)
+            : this(command, settings, CreateInstance(type, GetFactoryMethod(commandFactory)), group, GetReleaseMethod(commandFactory))
         {
         }
 
-        public CommandInvoker(string command, Settings settings, ICommand commandInstance, string group = null)
+        public CommandInvoker(string command, Settings settings, ICommand commandInstance, string group = null, Action<ICommand> releaseMethod = null)
         {
+            if (command == null) throw new ArgumentNullException(nameof(command));
+            if (settings == null) throw new ArgumentNullException(nameof(settings));
+            if (commandInstance == null) throw new ArgumentNullException(nameof(commandInstance));
+
             _settings = settings;
             _commandInstance = commandInstance;
+            _releaser = releaseMethod ?? DefaultReleaseMethod;
 
             Command = command;
             Group = group;
             Parameters = GetParameters(Type);
         }
 
-        static ICommand CreateInstance(Type type)
+        static void DefaultReleaseMethod(ICommand command)
+        {
+            var disposable = command as IDisposable;
+
+            disposable?.Dispose();
+        }
+
+        static Func<Type, ICommand> GetFactoryMethod(ICommandFactory commandFactory)
+        {
+            if (commandFactory == null) return null;
+
+            return commandFactory.Create;
+        }
+
+        static Action<ICommand> GetReleaseMethod(ICommandFactory commandFactory)
+        {
+            if (commandFactory == null) return null;
+
+            return commandFactory.Release;
+        }
+
+        static ICommand CreateInstance(Type type, Func<Type, ICommand> commandFactory = null)
         {
             try
             {
-                var instance = Activator.CreateInstance(type);
+                var instance = commandFactory?.Invoke(type)
+                               ?? Activator.CreateInstance(type);
 
                 if (!(instance is ICommand))
                 {
@@ -91,6 +119,18 @@ namespace GoCommando.Internals
 
         public void Invoke(IEnumerable<Switch> switches, EnvironmentSettings environmentSettings)
         {
+            try
+            {
+                InnerInvoke(switches, environmentSettings);
+            }
+            finally
+            {
+                _releaser(CommandInstance);
+            }
+        }
+
+        void InnerInvoke(IEnumerable<Switch> switches, EnvironmentSettings environmentSettings)
+        {
             var commandInstance = _commandInstance;
 
             var requiredParametersMissing = Parameters
@@ -105,7 +145,8 @@ namespace GoCommando.Internals
                 var requiredParametersMissingString = string.Join(Environment.NewLine,
                     requiredParametersMissing.Select(p => $"    {_settings.SwitchPrefix}{p.Name} - {p.DescriptionText}"));
 
-                throw new GoCommandoException($@"The following required parameters are missing:
+                throw new GoCommandoException(
+                    $@"The following required parameters are missing:
 
 {requiredParametersMissingString}");
             }
@@ -121,7 +162,8 @@ namespace GoCommando.Internals
                         ? $"    {_settings.SwitchPrefix}{p.Key} = {p.Value}"
                         : $"    {_settings.SwitchPrefix}{p.Key}"));
 
-                throw new GoCommandoException($@"The following switches do not have a corresponding parameter:
+                throw new GoCommandoException(
+                    $@"The following switches do not have a corresponding parameter:
 
 {switchesWithoutMathingParameterString}");
             }
@@ -137,7 +179,7 @@ namespace GoCommando.Internals
             commandInstance.Run();
         }
 
-        void ResolveParametersFromEnvironmentSettings(EnvironmentSettings environmentSettings, ICommand commandInstance, HashSet<Parameter> setParameters, IEnumerable<Parameter> parameters)
+        static void ResolveParametersFromEnvironmentSettings(EnvironmentSettings environmentSettings, ICommand commandInstance, HashSet<Parameter> setParameters, IEnumerable<Parameter> parameters)
         {
             foreach (var parameter in parameters.Where(p => p.AllowAppSetting && !setParameters.Contains(p)))
             {
@@ -167,7 +209,7 @@ namespace GoCommando.Internals
             }
         }
 
-        void ResolveParametersWithDefaultValues(HashSet<Parameter> setParameters, ICommand commandInstance)
+        void ResolveParametersWithDefaultValues(IEnumerable<Parameter> setParameters, ICommand commandInstance)
         {
             foreach (var parameterWithDefaultValue in Parameters.Where(p => p.HasDefaultValue).Except(setParameters))
             {
@@ -175,7 +217,7 @@ namespace GoCommando.Internals
             }
         }
 
-        void ResolveParametersFromSwitches(IEnumerable<Switch> switches, ICommand commandInstance, HashSet<Parameter> setParameters)
+        void ResolveParametersFromSwitches(IEnumerable<Switch> switches, ICommand commandInstance, ISet<Parameter> setParameters)
         {
             foreach (var switchToSet in switches)
             {
