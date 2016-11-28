@@ -223,7 +223,7 @@ namespace GoCommando.Internals
 
         static bool CanBeResolvedFromSwitches(IEnumerable<Switch> switches, Parameter p)
         {
-            return switches.Any(s => s.Key == p.Name);
+            return switches.Any(s => p.MatchesKey(s.Key));
         }
     }
 }
