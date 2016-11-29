@@ -14,9 +14,25 @@ namespace GoCommando
     public static class Go
     {
         /// <summary>
+        /// Call this method from your <code>Main</code> method if you want to supply a custom <see cref="ICommandFactory"/> which 
+        /// will be used to create command instances
+        /// </summary>
+        public static void Run<TCommandFactory>() where TCommandFactory : ICommandFactory, new()
+        {
+            var commandFactory = CreateCommandFactory<TCommandFactory>();
+
+            Run(commandFactory);
+        }
+
+        /// <summary>
         /// Call this method from your <code>Main</code> method
         /// </summary>
         public static void Run()
+        {
+            Run(null);
+        }
+
+        static void Run(ICommandFactory commandFactory)
         {
             try
             {
@@ -28,7 +44,7 @@ namespace GoCommando
                     Console.WriteLine(bannerAttribute.BannerText);
                 }
 
-                InnerRun();
+                InnerRun(commandFactory);
             }
             catch (GoCommandoException friendlyException)
             {
@@ -50,6 +66,18 @@ namespace GoCommando
             }
         }
 
+        static TCommandFactory CreateCommandFactory<TCommandFactory>() where TCommandFactory : ICommandFactory, new()
+        {
+            try
+            {
+                return new TCommandFactory();
+            }
+            catch (Exception exception)
+            {
+                throw new ApplicationException($"Could not create command factory of type {typeof(TCommandFactory)}", exception);
+            }
+        }
+
         static void FailAndExit(Exception customExitCodeException, int exitCode)
         {
             Console.WriteLine();
@@ -61,12 +89,12 @@ namespace GoCommando
             Environment.ExitCode = exitCode;
         }
 
-        static void InnerRun()
+        static void InnerRun(ICommandFactory commandFactory)
         {
             var args = Environment.GetCommandLineArgs().Skip(1).ToList();
             var settings = new Settings();
             var arguments = Parse(args, settings);
-            var commandTypes = GetCommands(settings);
+            var commandTypes = GetCommands(commandFactory, settings);
 
             var helpSwitch = arguments.Switches.FirstOrDefault(s => s.Key == "?")
                              ?? arguments.Switches.FirstOrDefault(s => s.Key == "help");
@@ -83,19 +111,18 @@ namespace GoCommando
                     {
                         if (command.Parameters.Any())
                         {
-                            Console.WriteLine(@"{0}
+                            Console.WriteLine(
+                                $@"{command.Description}
 
 Type
 
-    {1} {2} <args>
+    {exe} {command.Command} <args>
 
 where <args> can consist of the following parameters:
 
-{3}", 
-command.Description,
-exe, 
-command.Command,
-string.Join(Environment.NewLine, command.Parameters.Select(parameter => FormatParameter(parameter, settings))));
+{string
+                                    .Join(Environment.NewLine,
+                                        command.Parameters.Select(parameter => FormatParameter(parameter, settings)))}");
                         }
                         else
                         {
@@ -177,7 +204,7 @@ to get help for a command.
                 .Select(g => $@"    {g.Key}:
 
 {string.Join(Environment.NewLine, g.Select(c => $"      {c.Command} - {c.Description}"))}"));
-                
+
         }
 
         static string FormatParameter(Parameter parameter, Settings settings)
@@ -228,7 +255,7 @@ to get help for a command.
 ";
         }
 
-        internal static List<CommandInvoker> GetCommands(Settings settings)
+        internal static List<CommandInvoker> GetCommands(ICommandFactory commandFactory, Settings settings)
         {
             var commandAttributes = Assembly.GetEntryAssembly().GetTypes()
                 .Select(t => new
@@ -256,7 +283,7 @@ to get help for a command.
                 {
                     var a = g.First();
 
-                    return new CommandInvoker(a.Attribute.Command, a.Type, settings, a.Attribute.Group);
+                    return new CommandInvoker(a.Attribute.Command, a.Type, settings, a.Attribute.Group, commandFactory);
                 })
                 .ToList();
         }
@@ -337,7 +364,7 @@ to get help for a command.
             return GetKeyAndValueFromKey(key) != null;
         }
 
-        static KeyValuePair<string,string>? GetKeyAndValueFromKey(string key)
+        static KeyValuePair<string, string>? GetKeyAndValueFromKey(string key)
         {
             for (var index = 0; index < key.Length; index++)
             {

@@ -6,6 +6,7 @@
         {
             SwitchPrefix = "-";
         }
+
         public string SwitchPrefix { get; set; }
     }
 }
