@@ -25,10 +25,26 @@ namespace GoCommando.Tests
             Assert.That(bimseInstance.Switch, Is.EqualTo("value2"));
         }
 
+        [TestCase("-s:value2")]
+        [TestCase("-s=value2")]
+        [TestCase(@"-s""value2""")]
+        public void CanCorrectlyHandleDifferentAlternativeSwitchFormatsFoundInOneSingleTokenOnly_Shortname(string switchText)
+        {
+            var settings = new Settings();
+            var invoker = new CommandInvoker("bimse", settings, new Bimse());
+            var arguments = Go.Parse(new[] { switchText }, settings);
+
+            invoker.Invoke(arguments.Switches, EnvironmentSettings.Empty);
+
+            var bimseInstance = (Bimse)invoker.CommandInstance;
+
+            Assert.That(bimseInstance.Switch, Is.EqualTo("value2"));
+        }
+
         [Command("bimse")]
         class Bimse : ICommand
         {
-            [Parameter("switch")]
+            [Parameter("switch", shortName: "s")]
             public string Switch { get; set; }
 
             public void Run()
