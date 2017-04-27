@@ -140,15 +140,39 @@ namespace GoCommando.Internals
                             && !CanBeResolvedFromEnvironmentSettings(environmentSettings, p))
                 .ToList();
 
+            var optionalParamtersNotSpecified = Parameters
+                .Where(p => p.Optional
+                            && !CanBeResolvedFromSwitches(switches, p)
+                            && !CanBeResolvedFromEnvironmentSettings(environmentSettings, p))
+                .ToList();
+
             if (requiredParametersMissing.Any())
             {
                 var requiredParametersMissingString = string.Join(Environment.NewLine,
                     requiredParametersMissing.Select(p => $"    {_settings.SwitchPrefix}{p.Name} - {p.DescriptionText}"));
 
-                throw new GoCommandoException(
-                    $@"The following required parameters are missing:
+                var text = $@"The following required parameters are missing:
 
-{requiredParametersMissingString}");
+{requiredParametersMissingString}";
+
+                if (optionalParamtersNotSpecified.Any())
+                {
+                    var optionalParamtersNotSpecifiedString = string.Join(Environment.NewLine,
+                        optionalParamtersNotSpecified.Select(p => $"    {_settings.SwitchPrefix}{p.Name} - {p.DescriptionText}"));
+
+                    var moreText = $@"The following optional parameters are also available:
+
+{optionalParamtersNotSpecifiedString}";
+
+                    throw new GoCommandoException(string.Concat(
+                        text,
+                        Environment.NewLine,
+                        Environment.NewLine,
+                        moreText
+                    ));
+                }
+
+                throw new GoCommandoException(text);
             }
 
             var switchesWithoutMathingParameter = switches
