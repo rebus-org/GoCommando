@@ -3,7 +3,7 @@ What?
 
 GoCommando is a small command line utility helper that does the boring work when creating command line utilities in .NET.
 
-More info coming soon at http://mookid.dk/oncode/gocommando
+More info coming soon at http://mookid.dk/gocommando
 
 One day, maybe I'll tweet something as well... [@mookid8000][2]
 
