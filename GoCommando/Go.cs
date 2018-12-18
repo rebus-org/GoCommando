@@ -148,6 +148,17 @@ namespace GoCommando
             {
                 throw new ApplicationException("An error occurred when running the command under impersonation", exception);
             }
+
+            var output = process.StandardOutput.ReadToEnd();
+            var error = process.StandardError.ReadToEnd();
+
+            Write(output);
+            Write(error, "ERR");
+
+            if (process.ExitCode != 0)
+            {
+                throw new ApplicationException($"Impersonated process exited with code {process.ExitCode}");
+            }
         }
 
         static string EnsureQuoted(string str)
