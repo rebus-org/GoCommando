@@ -152,6 +152,7 @@ namespace GoCommando
 
         static string EnsureQuoted(string str)
         {
+            if (str == null) return str;
             const string doubleQuote = "\"";
             return str.StartsWith(doubleQuote) && str.EndsWith(doubleQuote) ? str : $"\"{str}\"";
         }
