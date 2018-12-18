@@ -128,7 +128,21 @@ namespace GoCommando
                 StartInfo = processStartInfo,
             };
 
-            void Write(string str, string prefix = "") => Console.WriteLine(string.IsNullOrWhiteSpace(str) ? "" : $"{prefix} {str}");
+            void Write(string str, string prefix = "")
+            {
+                if (string.IsNullOrWhiteSpace(str))
+                {
+                    Console.WriteLine();
+                }
+                else if (string.IsNullOrWhiteSpace(prefix))
+                {
+                    Console.WriteLine(str);
+                }
+                else
+                {
+                    Console.WriteLine($"{prefix} {str}");
+                }
+            }
 
             process.OutputDataReceived += (s, ea) => Write(ea.Data);
             process.ErrorDataReceived += (s, ea) => Write(ea.Data, "ERR");
