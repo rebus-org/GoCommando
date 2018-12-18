@@ -2,9 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security;
 using GoCommando.Internals;
+using Switch = GoCommando.Internals.Switch;
+// ReSharper disable ArgumentsStyleNamedExpression
 
 namespace GoCommando
 {
@@ -36,15 +41,32 @@ namespace GoCommando
         {
             try
             {
-                var bannerAttribute = Assembly.GetEntryAssembly()?.EntryPoint?.DeclaringType
-                    .GetCustomAttribute<BannerAttribute>();
+                var declaringType = Assembly.GetEntryAssembly()?.EntryPoint?.DeclaringType;
+                var supportImpersonation = declaringType?.GetCustomAttribute<SupportImpersonationAttribute>() != null;
+
+                if (supportImpersonation)
+                {
+                    var args = Environment.GetCommandLineArgs().Skip(1).ToList();
+                    var settings = new Settings();
+                    var arguments = Parse(args, settings);
+
+                    var impersonateNow = arguments.Switches.Any(s => s.Key == "username");
+
+                    if (impersonateNow)
+                    {
+                        Impersonate(arguments);
+                        return;
+                    }
+                }
+
+                var bannerAttribute = declaringType?.GetCustomAttribute<BannerAttribute>();
 
                 if (bannerAttribute != null)
                 {
                     Console.WriteLine(bannerAttribute.BannerText);
                 }
 
-                InnerRun(commandFactory);
+                InnerRun(commandFactory, supportImpersonation);
             }
             catch (GoCommandoException friendlyException)
             {
@@ -65,6 +87,75 @@ namespace GoCommando
                 FailAndExit(exception, -2);
             }
         }
+
+        static void Impersonate(Arguments arguments)
+        {
+            var username = arguments.Switches.First(s => s.Key == "username");
+            var password = arguments.Switches.FirstOrDefault(s => s.Key == "password")
+                           ?? throw new ArgumentException("Please remember to also specify the -password switch when you use the -username switch");
+            var domain = arguments.Switches.FirstOrDefault(s => s.Key == "domain")?.Value;
+
+            var keysToRemove = new[] { "username", "password", "domain" };
+
+            Impersonate(username.Value, password.Value, domain, arguments.Switches.Where(s => !keysToRemove.Contains(s.Key)), arguments.Command);
+        }
+
+        static void Impersonate(string username, string password, string domain, IEnumerable<Switch> switches, string command)
+        {
+            var commandLineArgs = string.Join(" ", switches.Select(s => $"-{s.Key} {EnsureQuoted(s.Value)}"));
+            var ohSoSecureString = new SecureString();
+
+            foreach (var @char in password) { ohSoSecureString.AppendChar(@char); }
+
+            var processStartInfo = new ProcessStartInfo
+            {
+                FileName = $"{Assembly.GetEntryAssembly().GetName().Name}.exe",
+                Arguments = $"{command} {string.Join(" ", commandLineArgs)}",
+                WorkingDirectory = Environment.CurrentDirectory,
+
+                UserName = username,
+                Domain = domain,
+                Password = ohSoSecureString,
+
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            };
+
+            var process = new Process
+            {
+                StartInfo = processStartInfo,
+            };
+
+            void Write(string str, string prefix = "") => Console.WriteLine(string.IsNullOrWhiteSpace(str) ? "" : $"{prefix} {str}");
+
+            process.OutputDataReceived += (s, ea) => Write(ea.Data);
+            process.ErrorDataReceived += (s, ea) => Write(ea.Data, "ERR");
+
+            try
+            {
+                Console.WriteLine($"Invoking command as {username}...");
+
+                process.Start();
+
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
+
+                process.WaitForExit();
+            }
+            catch (Exception exception)
+            {
+                throw new ApplicationException("An error occurred when running the command under impersonation", exception);
+            }
+        }
+
+        static string EnsureQuoted(string str)
+        {
+            const string doubleQuote = "\"";
+            return str.StartsWith(doubleQuote) && str.EndsWith(doubleQuote) ? str : $"\"{str}\"";
+        }
+
 
         static TCommandFactory CreateCommandFactory<TCommandFactory>() where TCommandFactory : ICommandFactory, new()
         {
@@ -89,12 +180,12 @@ namespace GoCommando
             Environment.ExitCode = exitCode;
         }
 
-        static void InnerRun(ICommandFactory commandFactory)
+        static void InnerRun(ICommandFactory commandFactory, bool supportImpersonation)
         {
             var args = Environment.GetCommandLineArgs().Skip(1).ToList();
             var settings = new Settings();
             var arguments = Parse(args, settings);
-            var commandTypes = GetCommands(commandFactory, settings);
+            var commandTypes = GetCommands(commandFactory, settings, supportImpersonation: supportImpersonation);
 
             var helpSwitch = arguments.Switches.FirstOrDefault(s => s.Key == "?")
                              ?? arguments.Switches.FirstOrDefault(s => s.Key == "help");
@@ -255,7 +346,7 @@ to get help for a command.
 ";
         }
 
-        internal static List<CommandInvoker> GetCommands(ICommandFactory commandFactory, Settings settings)
+        internal static List<CommandInvoker> GetCommands(ICommandFactory commandFactory, Settings settings, bool supportImpersonation)
         {
             var commandAttributes = Assembly.GetEntryAssembly().GetTypes()
                 .Select(t => new

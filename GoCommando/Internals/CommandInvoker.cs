@@ -10,8 +10,10 @@ namespace GoCommando.Internals
         readonly Settings _settings;
         readonly ICommand _commandInstance;
         readonly Action<ICommand> _releaser;
+        readonly List<Parameter> _parameters;
 
-        public CommandInvoker(string command, Type type, Settings settings, string group = null, ICommandFactory commandFactory = null)
+        public CommandInvoker(string command, Type type, Settings settings, string @group = null,
+            ICommandFactory commandFactory = null)
             : this(command, settings, CreateInstance(type, GetFactoryMethod(commandFactory)), group, GetReleaseMethod(commandFactory))
         {
         }
@@ -28,7 +30,8 @@ namespace GoCommando.Internals
 
             Command = command;
             Group = group;
-            Parameters = GetParameters(Type);
+
+            _parameters = GetParameters(Type).ToList();
         }
 
         static void DefaultReleaseMethod(ICommand command)
@@ -110,7 +113,7 @@ namespace GoCommando.Internals
 
         public Type Type => _commandInstance.GetType();
 
-        public IEnumerable<Parameter> Parameters { get; }
+        public IEnumerable<Parameter> Parameters => _parameters;
 
         public string Description => Type.GetCustomAttribute<DescriptionAttribute>()?.DescriptionText ??
                                      "(no help text for this command)";

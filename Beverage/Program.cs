@@ -7,6 +7,7 @@ Beverage Utility
 
 Copyright (c) 2015 El Duderino
 ------------------------------")]
+    [SupportImpersonation]
     class Program
     {
         static void Main()
