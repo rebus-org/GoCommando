@@ -121,6 +121,10 @@ namespace GoCommando
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+
+                ErrorDialog = false,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                LoadUserProfile = false
             };
 
             var process = new Process
