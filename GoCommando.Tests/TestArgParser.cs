@@ -12,7 +12,7 @@ namespace GoCommando.Tests
         [Test]
         public void CanReturnSimpleCommand()
         {
-            var arguments = Parse(new[] { "run" });
+            var arguments = Parse(new[] {"run"});
 
             Assert.That(arguments.Command, Is.EqualTo("run"));
         }
@@ -20,7 +20,7 @@ namespace GoCommando.Tests
         [Test]
         public void CommandIsNullWhenNoCommandIsGiven()
         {
-            var arguments = Parse(new[] { "-file", @"""C:\temp\file.json""" });
+            var arguments = Parse(new[] {"-file", @"""C:\temp\file.json"""});
 
             Assert.That(arguments.Command, Is.Null);
         }
@@ -28,10 +28,7 @@ namespace GoCommando.Tests
         [Test, Ignore("arguments.Command should just be null")]
         public void DoesNotAcceptSwitchAsCommand()
         {
-            var ex = Assert.Throws<GoCommandoException>(() =>
-            {
-                Parse(new[] { "-file", @"""C:\temp\file.json""" });
-            });
+            var ex = Assert.Throws<GoCommandoException>(() => { Parse(new[] {"-file", @"""C:\temp\file.json"""}); });
 
             Console.WriteLine(ex);
         }
@@ -45,7 +42,7 @@ c:\Program Files
 -dir
 c:\Windows\Microsoft.NET\Framework
 -flag
--moreflag".Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+-moreflag".Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
 
             var arguments = Parse(args);
 
@@ -66,7 +63,7 @@ c:\Windows\Microsoft.NET\Framework
         [TestCase(@"-path""c:\temp""")]
         public void SupportsVariousSingleTokenAliases(string alias)
         {
-            var arguments = Parse(new[] { alias });
+            var arguments = Parse(new[] {alias});
 
             Assert.That(arguments.Switches.Count(), Is.EqualTo(1));
             Assert.That(arguments.Switches.Single().Key, Is.EqualTo("path"));
@@ -76,7 +73,7 @@ c:\Windows\Microsoft.NET\Framework
         [TestCase(@"-n23")]
         public void SupportsShortFormWithNumber(string alias)
         {
-            var arguments = Parse(new[] { alias });
+            var arguments = Parse(new[] {alias});
 
             Assert.That(arguments.Switches.Count(), Is.EqualTo(1));
             Assert.That(arguments.Switches.Single().Key, Is.EqualTo("n"));

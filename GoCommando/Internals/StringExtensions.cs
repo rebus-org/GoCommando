@@ -10,7 +10,7 @@ namespace GoCommando.Internals
         {
             var twoLineBreaks = Environment.NewLine + Environment.NewLine;
 
-            var sections = str.Split(new[] { twoLineBreaks },
+            var sections = str.Split(new[] {twoLineBreaks},
                 StringSplitOptions.RemoveEmptyEntries);
 
             return string.Join(twoLineBreaks, sections.Select(section => WrapSection(section, width)));
@@ -19,9 +19,9 @@ namespace GoCommando.Internals
         static string WrapSection(string section, int width)
         {
             var oneLongString = string.Join(" ",
-                section.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries));
+                section.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries));
 
-            var words = oneLongString.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            var words = oneLongString.Split(new[] {" "}, StringSplitOptions.RemoveEmptyEntries);
 
             var builder = new StringBuilder();
 
@@ -59,7 +59,7 @@ namespace GoCommando.Internals
         public static string Indented(this string str, int indent)
         {
             var indentedLines = str
-                .Split(new[] { Environment.NewLine }, StringSplitOptions.None)
+                .Split(new[] {Environment.NewLine}, StringSplitOptions.None)
                 .Select(line => string.Concat(new string(' ', indent), line));
 
             return string.Join(Environment.NewLine, indentedLines);

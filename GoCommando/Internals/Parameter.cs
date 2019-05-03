@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace GoCommando.Internals
 {
-    class Parameter : IEquatable<Parameter>
+    public class Parameter : IEquatable<Parameter>
     {
         public PropertyInfo PropertyInfo { get; }
         public string Name { get; }
@@ -22,13 +22,16 @@ namespace GoCommando.Internals
 
         public bool HasDefaultValue => DefaultValue != null;
 
-        public Parameter(PropertyInfo propertyInfo, string name, string shortname, bool optional, string descriptionText, IEnumerable<string> exampleValues, string defaultValue, bool allowAppSetting, bool allowConnectionString, bool allowEnvironmentVariable)
+        public Parameter(PropertyInfo propertyInfo, string name, string shortname, bool optional,
+            string descriptionText, IEnumerable<string> exampleValues, string defaultValue, bool allowAppSetting,
+            bool allowConnectionString, bool allowEnvironmentVariable)
         {
             PropertyInfo = propertyInfo;
             Name = name;
             Shortname = shortname;
             Optional = optional;
-            DescriptionText = GetText(descriptionText, allowAppSetting, allowConnectionString, allowEnvironmentVariable);
+            DescriptionText = GetText(descriptionText, allowAppSetting, allowConnectionString,
+                allowEnvironmentVariable);
             DefaultValue = defaultValue;
             AllowAppSetting = allowAppSetting;
             AllowConnectionString = allowConnectionString;
@@ -36,7 +39,8 @@ namespace GoCommando.Internals
             ExampleValues = exampleValues.ToArray();
         }
 
-        private string GetText(string descriptionText, bool allowAppSetting, bool allowConnectionString, bool allowEnvironmentVariable)
+        private string GetText(string descriptionText, bool allowAppSetting, bool allowConnectionString,
+            bool allowEnvironmentVariable)
         {
             if (!allowAppSetting && !allowConnectionString && !allowEnvironmentVariable)
             {
@@ -81,7 +85,9 @@ namespace GoCommando.Internals
             }
             catch (Exception exception)
             {
-                throw new FormatException($"Could not set value '{value}' on property named '{PropertyInfo.Name}' on {PropertyInfo.DeclaringType}", exception);
+                throw new FormatException(
+                    $"Could not set value '{value}' on property named '{PropertyInfo.Name}' on {PropertyInfo.DeclaringType}",
+                    exception);
             }
         }
 
@@ -89,7 +95,8 @@ namespace GoCommando.Internals
         {
             if (!HasDefaultValue)
             {
-                throw new InvalidOperationException($"Cannot apply default value of '{Name}' parameter because it has no default!");
+                throw new InvalidOperationException(
+                    $"Cannot apply default value of '{Name}' parameter because it has no default!");
             }
 
             SetValue(commandInstance, DefaultValue);

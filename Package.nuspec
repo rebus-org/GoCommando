@@ -15,7 +15,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="GoCommando\bin\Release\GoCommando.dll" target="lib\NET45" />
-    <file src="GoCommando\bin\Release\GoCommando.xml" target="lib\NET45" />
+    <file src="GoCommando\bin\Release\netstandard2.0\GoCommando.dll" target="lib\NETSTANDARD2.0" />
+    <file src="GoCommando\bin\Release\netstandard2.0\GoCommando.xml" target="lib\NETSTANDARD2.0" />
   </files>
 </package>

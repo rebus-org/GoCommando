@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using GoCommando.Internals;
 using Switch = GoCommando.Internals.Switch;
+
 // ReSharper disable ArgumentsStyleNamedExpression
 
 namespace GoCommando
@@ -92,20 +93,26 @@ namespace GoCommando
         {
             var username = arguments.Switches.First(s => s.Key == "username");
             var password = arguments.Switches.FirstOrDefault(s => s.Key == "password")
-                           ?? throw new ArgumentException("Please remember to also specify the -password switch when you use the -username switch");
+                           ?? throw new ArgumentException(
+                               "Please remember to also specify the -password switch when you use the -username switch");
             var domain = arguments.Switches.FirstOrDefault(s => s.Key == "domain")?.Value;
 
-            var keysToRemove = new[] { "username", "password", "domain" };
+            var keysToRemove = new[] {"username", "password", "domain"};
 
-            Impersonate(username.Value, password.Value, domain, arguments.Switches.Where(s => !keysToRemove.Contains(s.Key)), arguments.Command);
+            Impersonate(username.Value, password.Value, domain,
+                arguments.Switches.Where(s => !keysToRemove.Contains(s.Key)), arguments.Command);
         }
 
-        static void Impersonate(string username, string password, string domain, IEnumerable<Switch> switches, string command)
+        static void Impersonate(string username, string password, string domain, IEnumerable<Switch> switches,
+            string command)
         {
             var commandLineArgs = string.Join(" ", switches.Select(s => $"-{s.Key} {EnsureQuoted(s.Value)}"));
             var ohSoSecureString = new SecureString();
 
-            foreach (var @char in password) { ohSoSecureString.AppendChar(@char); }
+            foreach (var @char in password)
+            {
+                ohSoSecureString.AppendChar(@char);
+            }
 
             var processStartInfo = new ProcessStartInfo
             {
@@ -164,7 +171,8 @@ namespace GoCommando
             }
             catch (Exception exception)
             {
-                throw new ApplicationException("An error occurred when running the command under impersonation", exception);
+                throw new ApplicationException("An error occurred when running the command under impersonation",
+                    exception);
             }
 
             if (process.ExitCode != 0)
@@ -189,7 +197,8 @@ namespace GoCommando
             }
             catch (Exception exception)
             {
-                throw new ApplicationException($"Could not create command factory of type {typeof(TCommandFactory)}", exception);
+                throw new ApplicationException($"Could not create command factory of type {typeof(TCommandFactory)}",
+                    exception);
             }
         }
 
@@ -247,6 +256,7 @@ where <args> can consist of the following parameters:
 
 ", exe, command.Command);
                         }
+
                         return;
                     }
 
@@ -296,7 +306,7 @@ to get help for a command.
 
             var environmentVariables = Environment.GetEnvironmentVariables()
                 .Cast<DictionaryEntry>()
-                .ToDictionary(a => (string)a.Key, a => (string)a.Value);
+                .ToDictionary(a => (string) a.Key, a => (string) a.Value);
 
             var environmentSettings = new EnvironmentSettings(appSettings, connectionStrings, environmentVariables);
 
@@ -316,10 +326,9 @@ to get help for a command.
 
             return string.Join(Environment.NewLine + Environment.NewLine,
                 commandGroups
-                .Select(g => $@"    {g.Key}:
+                    .Select(g => $@"    {g.Key}:
 
 {string.Join(Environment.NewLine, g.Select(c => $"      {c.Command} - {c.Description}"))}"));
-
         }
 
         static string FormatParameter(Parameter parameter, Settings settings)
@@ -370,7 +379,8 @@ to get help for a command.
 ";
         }
 
-        internal static List<CommandInvoker> GetCommands(ICommandFactory commandFactory, Settings settings, bool supportImpersonation)
+        internal static List<CommandInvoker> GetCommands(ICommandFactory commandFactory, Settings settings,
+            bool supportImpersonation)
         {
             var commandAttributes = Assembly.GetEntryAssembly().GetTypes()
                 .Select(t => new
@@ -403,7 +413,7 @@ to get help for a command.
                 .ToList();
         }
 
-        internal static Arguments Parse(IEnumerable<string> args, Settings settings)
+        public static Arguments Parse(IEnumerable<string> args, Settings settings)
         {
             var list = args.ToList();
 
@@ -447,6 +457,7 @@ to get help for a command.
                         {
                             throw new ApplicationException($"Expected to get key-value-pair from key '{key}'");
                         }
+
                         switches.Add(Switch.KeyValue(keyAndValue.Value.Key, keyAndValue.Value.Value));
                         key = null;
                     }
@@ -458,7 +469,8 @@ to get help for a command.
 
                 if (key == null)
                 {
-                    throw new GoCommandoException($"Got command line argument '{value}' without a switch in front of it - please specify switches like this: '{settings.SwitchPrefix}switch some-value'");
+                    throw new GoCommandoException(
+                        $"Got command line argument '{value}' without a switch in front of it - please specify switches like this: '{settings.SwitchPrefix}switch some-value'");
                 }
 
                 switches.Add(Switch.KeyValue(key, value));

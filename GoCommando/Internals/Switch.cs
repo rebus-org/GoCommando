@@ -1,9 +1,10 @@
 ﻿// ReSharper disable LoopCanBeConvertedToQuery
+
 namespace GoCommando.Internals
 {
-    class Switch
+    public class Switch
     {
-        static readonly char[] AcceptedQuoteCharacters = { '"', '\'' };
+        static readonly char[] AcceptedQuoteCharacters = {'"', '\''};
 
         public static Switch KeyValue(string key, string value)
         {

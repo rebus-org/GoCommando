@@ -1,6 +1,6 @@
 ﻿namespace GoCommando.Internals
 {
-    class Settings
+    public class Settings
     {
         public Settings()
         {

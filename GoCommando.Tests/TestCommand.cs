@@ -16,11 +16,11 @@ namespace GoCommando.Tests
         {
             var settings = new Settings();
             var invoker = new CommandInvoker("bimse", settings, new Bimse());
-            var arguments = Go.Parse(new[] { switchText }, settings);
+            var arguments = Go.Parse(new[] {switchText}, settings);
 
             invoker.Invoke(arguments.Switches, EnvironmentSettings.Empty);
 
-            var bimseInstance = (Bimse)invoker.CommandInstance;
+            var bimseInstance = (Bimse) invoker.CommandInstance;
 
             Assert.That(bimseInstance.Switch, Is.EqualTo("value2"));
         }
@@ -28,15 +28,16 @@ namespace GoCommando.Tests
         [TestCase("-s:value2")]
         [TestCase("-s=value2")]
         [TestCase(@"-s""value2""")]
-        public void CanCorrectlyHandleDifferentAlternativeSwitchFormatsFoundInOneSingleTokenOnly_Shortname(string switchText)
+        public void CanCorrectlyHandleDifferentAlternativeSwitchFormatsFoundInOneSingleTokenOnly_Shortname(
+            string switchText)
         {
             var settings = new Settings();
             var invoker = new CommandInvoker("bimse", settings, new Bimse());
-            var arguments = Go.Parse(new[] { switchText }, settings);
+            var arguments = Go.Parse(new[] {switchText}, settings);
 
             invoker.Invoke(arguments.Switches, EnvironmentSettings.Empty);
 
-            var bimseInstance = (Bimse)invoker.CommandInstance;
+            var bimseInstance = (Bimse) invoker.CommandInstance;
 
             Assert.That(bimseInstance.Switch, Is.EqualTo("value2"));
         }
@@ -44,8 +45,7 @@ namespace GoCommando.Tests
         [Command("bimse")]
         class Bimse : ICommand
         {
-            [Parameter("switch", shortName: "s")]
-            public string Switch { get; set; }
+            [Parameter("switch", shortName: "s")] public string Switch { get; set; }
 
             public void Run()
             {
@@ -57,16 +57,18 @@ namespace GoCommando.Tests
         {
             var commandFactory = new CustomFactory();
 
-            var commandInvoker = new CommandInvoker("null", typeof(CreatedByFactory), new Settings(), commandFactory: commandFactory);
+            var commandInvoker = new CommandInvoker("null", typeof(CreatedByFactory), new Settings(),
+                commandFactory: commandFactory);
 
             commandInvoker.Invoke(Enumerable.Empty<Switch>(), new EnvironmentSettings());
 
             Assert.That(commandInvoker.CommandInstance, Is.TypeOf<CreatedByFactory>());
 
-            var createdByFactory = (CreatedByFactory)commandInvoker.CommandInstance;
+            var createdByFactory = (CreatedByFactory) commandInvoker.CommandInstance;
             Assert.That(createdByFactory.CtorInjectedValue, Is.EqualTo("ctor!!"));
 
-            Assert.That(commandFactory.WasProperlyReleased, Is.True, "The created command instance was NOT properly released after use!");
+            Assert.That(commandFactory.WasProperlyReleased, Is.True,
+                "The created command instance was NOT properly released after use!");
         }
 
         class CustomFactory : ICommandFactory
@@ -129,9 +131,10 @@ namespace GoCommando.Tests
                 {"my-env", "my-value"}
             };
 
-            invoker.Invoke(Enumerable.Empty<Switch>(), new EnvironmentSettings(appSettings, connectionStrings, environmentVariables));
+            invoker.Invoke(Enumerable.Empty<Switch>(),
+                new EnvironmentSettings(appSettings, connectionStrings, environmentVariables));
 
-            var instance = (CanUseAppSetting)invoker.CommandInstance;
+            var instance = (CanUseAppSetting) invoker.CommandInstance;
 
             Assert.That(instance.AppSetting, Is.EqualTo("my-value"));
             Assert.That(instance.ConnectionString, Is.EqualTo("my-value"));
@@ -151,7 +154,6 @@ namespace GoCommando.Tests
 
             public void Run()
             {
-
             }
         }
     }

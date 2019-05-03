@@ -12,7 +12,7 @@ namespace GoCommando
         /// Gets the primary parameter name
         /// </summary>
         public string Name { get; }
-        
+
         /// <summary>
         /// Gets a shorthand for the parameter (or null if none has been specified)
         /// </summary>
@@ -22,12 +22,12 @@ namespace GoCommando
         /// Gets whether this parameter is optional
         /// </summary>
         public bool Optional { get; }
-        
+
         /// <summary>
         /// Gets a default value for the parameter (or null if none has been specified)
         /// </summary>
         public string DefaultValue { get; }
-        
+
         /// <summary>
         /// Gets whether this parameter can have its value resolved from the <code>&lt;appSettings&gt;</code> section of the application configuration file.
         /// If the value is provided with a command-line switch, the provided value takes precedence.
@@ -65,7 +65,9 @@ namespace GoCommando
         /// Indicates whether parameter value resolution can go and look for an environment variable for a value.
         /// Will look for the name specified by <paramref name="name"/>
         /// </param>
-        public ParameterAttribute(string name, string shortName = null, bool optional = false, string defaultValue = null, bool allowAppSetting = false, bool allowConnectionString = false, bool allowEnvironmentVariable = false)
+        public ParameterAttribute(string name, string shortName = null, bool optional = false,
+            string defaultValue = null, bool allowAppSetting = false, bool allowConnectionString = false,
+            bool allowEnvironmentVariable = false)
         {
             Name = name;
             ShortName = shortName;

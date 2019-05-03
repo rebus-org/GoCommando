@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace GoCommando.Internals
 {
-    class Arguments
+    public class Arguments
     {
         readonly Settings _settings;
 
@@ -37,14 +37,14 @@ namespace GoCommando.Internals
             {
                 if (desiredType == typeof(bool))
                 {
-                    return (TValue)Convert.ChangeType(Switches.Any(s => s.Key == key), desiredType);
+                    return (TValue) Convert.ChangeType(Switches.Any(s => s.Key == key), desiredType);
                 }
 
                 var relevantSwitch = Switches.FirstOrDefault(s => s.Key == key);
 
                 if (relevantSwitch != null)
                 {
-                    return (TValue)Convert.ChangeType(relevantSwitch.Value, desiredType);
+                    return (TValue) Convert.ChangeType(relevantSwitch.Value, desiredType);
                 }
 
                 throw new GoCommandoException($"Could not find switch '{key}'");
@@ -52,7 +52,8 @@ namespace GoCommando.Internals
             catch (Exception exception)
             {
                 throw new FormatException($"Could not get switch '{key}' as a {desiredType}", exception);
-            }        }
+            }
+        }
 
         public override string ToString()
         {

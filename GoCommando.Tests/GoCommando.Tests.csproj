@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GoCommando.Tests</RootNamespace>
     <AssemblyName>GoCommando.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -53,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GoCommando\GoCommando.csproj">
-      <Project>{2839AA55-B40A-4BB8-BDA0-C5057E5A683F}</Project>
+      <Project>{FBFFCC6B-41E4-4C93-BA9F-EA7628422F60}</Project>
       <Name>GoCommando</Name>
     </ProjectReference>
   </ItemGroup>

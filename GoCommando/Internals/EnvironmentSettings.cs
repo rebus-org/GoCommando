@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GoCommando.Internals
 {
-    class EnvironmentSettings
+    public class EnvironmentSettings
     {
         static readonly IDictionary<string, string> None = new Dictionary<string, string>();
         public static readonly EnvironmentSettings Empty = new EnvironmentSettings(None, None);
@@ -12,7 +12,9 @@ namespace GoCommando.Internals
         readonly IDictionary<string, string> _connectionStrings;
         readonly IDictionary<string, string> _environmentVariables;
 
-        public EnvironmentSettings(IDictionary<string, string> appSettings = null, IDictionary<string, string> connectionStrings = null, IDictionary<string, string> environmentVariables = null)
+        public EnvironmentSettings(IDictionary<string, string> appSettings = null,
+            IDictionary<string, string> connectionStrings = null,
+            IDictionary<string, string> environmentVariables = null)
         {
             _environmentVariables = environmentVariables ?? None;
             _appSettings = appSettings ?? None;
@@ -54,7 +56,8 @@ namespace GoCommando.Internals
             }
             catch (Exception exception)
             {
-                throw new KeyNotFoundException($"Could not find environment variable with the name '{name}'", exception);
+                throw new KeyNotFoundException($"Could not find environment variable with the name '{name}'",
+                    exception);
             }
         }
 

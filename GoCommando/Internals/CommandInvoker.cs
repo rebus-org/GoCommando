@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace GoCommando.Internals
 {
-    class CommandInvoker
+    public class CommandInvoker
     {
         readonly Settings _settings;
         readonly ICommand _commandInstance;
@@ -14,11 +14,13 @@ namespace GoCommando.Internals
 
         public CommandInvoker(string command, Type type, Settings settings, string @group = null,
             ICommandFactory commandFactory = null)
-            : this(command, settings, CreateInstance(type, GetFactoryMethod(commandFactory)), group, GetReleaseMethod(commandFactory))
+            : this(command, settings, CreateInstance(type, GetFactoryMethod(commandFactory)), group,
+                GetReleaseMethod(commandFactory))
         {
         }
 
-        public CommandInvoker(string command, Settings settings, ICommand commandInstance, string group = null, Action<ICommand> releaseMethod = null)
+        public CommandInvoker(string command, Settings settings, ICommand commandInstance, string group = null,
+            Action<ICommand> releaseMethod = null)
         {
             if (command == null) throw new ArgumentNullException(nameof(command));
             if (settings == null) throw new ArgumentNullException(nameof(settings));
@@ -67,7 +69,7 @@ namespace GoCommando.Internals
                     throw new ApplicationException($"{instance} does not implement ICommand!");
                 }
 
-                return (ICommand)instance;
+                return (ICommand) instance;
             }
             catch (Exception exception)
             {
@@ -152,7 +154,8 @@ namespace GoCommando.Internals
             if (requiredParametersMissing.Any())
             {
                 var requiredParametersMissingString = string.Join(Environment.NewLine,
-                    requiredParametersMissing.Select(p => $"    {_settings.SwitchPrefix}{p.Name} - {p.DescriptionText}"));
+                    requiredParametersMissing.Select(p =>
+                        $"    {_settings.SwitchPrefix}{p.Name} - {p.DescriptionText}"));
 
                 var text = $@"The following required parameters are missing:
 
@@ -161,7 +164,8 @@ namespace GoCommando.Internals
                 if (optionalParamtersNotSpecified.Any())
                 {
                     var optionalParamtersNotSpecifiedString = string.Join(Environment.NewLine,
-                        optionalParamtersNotSpecified.Select(p => $"    {_settings.SwitchPrefix}{p.Name} - {p.DescriptionText}"));
+                        optionalParamtersNotSpecified.Select(p =>
+                            $"    {_settings.SwitchPrefix}{p.Name} - {p.DescriptionText}"));
 
                     var moreText = $@"The following optional parameters are also available:
 
@@ -206,7 +210,8 @@ namespace GoCommando.Internals
             commandInstance.Run();
         }
 
-        static void ResolveParametersFromEnvironmentSettings(EnvironmentSettings environmentSettings, ICommand commandInstance, HashSet<Parameter> setParameters, IEnumerable<Parameter> parameters)
+        static void ResolveParametersFromEnvironmentSettings(EnvironmentSettings environmentSettings,
+            ICommand commandInstance, HashSet<Parameter> setParameters, IEnumerable<Parameter> parameters)
         {
             foreach (var parameter in parameters.Where(p => p.AllowAppSetting && !setParameters.Contains(p)))
             {
@@ -244,7 +249,8 @@ namespace GoCommando.Internals
             }
         }
 
-        void ResolveParametersFromSwitches(IEnumerable<Switch> switches, ICommand commandInstance, ISet<Parameter> setParameters)
+        void ResolveParametersFromSwitches(IEnumerable<Switch> switches, ICommand commandInstance,
+            ISet<Parameter> setParameters)
         {
             foreach (var switchToSet in switches)
             {
@@ -262,7 +268,8 @@ namespace GoCommando.Internals
             }
         }
 
-        static void SetParameter(ICommand commandInstance, ISet<Parameter> setParameters, Parameter parameter, string value)
+        static void SetParameter(ICommand commandInstance, ISet<Parameter> setParameters, Parameter parameter,
+            string value)
         {
             parameter.SetValue(commandInstance, value);
             setParameters.Add(parameter);
