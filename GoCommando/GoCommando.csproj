@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/rebus-org/GoCommando/wiki</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/rebus-org/GoCommando</RepositoryUrl>
   </PropertyGroup>
 
 </Project>
