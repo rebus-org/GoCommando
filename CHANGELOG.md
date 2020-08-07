@@ -1,5 +1,5 @@
 # Changelog
 
-## 0.0.1
+## 0.99.1
 * Test release
 
