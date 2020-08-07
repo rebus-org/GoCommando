@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{324FC1A5-749A-44BF-BDB7-EB093F5DD88F}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{2839AA55-B40A-4BB8-BDA0-C5057E5A683F}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Beverage</RootNamespace>
-    <AssemblyName>Beverage</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <RootNamespace>GoCommando</RootNamespace>
+    <AssemblyName>GoCommando</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,18 +21,21 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\GoCommando.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -43,20 +45,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\BlackRussian.cs" />
-    <Compile Include="Commands\Martini.cs" />
-    <Compile Include="Commands\WhiteRussian.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="DescriptionAttribute.cs" />
+    <Compile Include="ExampleAttribute.cs" />
+    <Compile Include="ExitCodeException.cs" />
+    <Compile Include="ICommand.cs" />
+    <Compile Include="ICommandFactory.cs" />
+    <Compile Include="Internals\Arguments.cs" />
+    <Compile Include="BannerAttribute.cs" />
+    <Compile Include="CommandAttribute.cs" />
+    <Compile Include="Go.cs" />
+    <Compile Include="GoCommandoException.cs" />
+    <Compile Include="Internals\CommandInvoker.cs" />
+    <Compile Include="Internals\EnvironmentSettings.cs" />
+    <Compile Include="Internals\Parameter.cs" />
+    <Compile Include="Internals\StringExtensions.cs" />
+    <Compile Include="ParameterAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\GoCommando\GoCommando.csproj">
-      <Project>{2839AA55-B40A-4BB8-BDA0-C5057E5A683F}</Project>
-      <Name>GoCommando</Name>
-    </ProjectReference>
+    <Compile Include="Internals\Settings.cs" />
+    <Compile Include="Internals\Switch.cs" />
+    <Compile Include="SupportImpersonationAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

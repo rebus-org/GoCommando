@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security;
 using GoCommando.Internals;
 using Switch = GoCommando.Internals.Switch;
@@ -281,23 +283,22 @@ to get help for a command.
 {availableCommands}");
             }
 
-            //var appSettings = ConfigurationManager.AppSettings.AllKeys
-            //    .Select(key => new
-            //    {
-            //        Key = key,
-            //        Value = ConfigurationManager.AppSettings[key]
-            //    })
-            //    .ToDictionary(a => a.Key, a => a.Value);
+            var appSettings = ConfigurationManager.AppSettings.AllKeys
+                .Select(key => new
+                {
+                    Key = key,
+                    Value = ConfigurationManager.AppSettings[key]
+                })
+                .ToDictionary(a => a.Key, a => a.Value);
 
-            //var connectionStrings = ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>()
-            //    .ToDictionary(a => a.Name, a => a.ConnectionString);
+            var connectionStrings = ConfigurationManager.ConnectionStrings.Cast<ConnectionStringSettings>()
+                .ToDictionary(a => a.Name, a => a.ConnectionString);
 
             var environmentVariables = Environment.GetEnvironmentVariables()
                 .Cast<DictionaryEntry>()
                 .ToDictionary(a => (string)a.Key, a => (string)a.Value);
 
-            //var environmentSettings = new EnvironmentSettings(appSettings, connectionStrings, environmentVariables);
-            var environmentSettings = new EnvironmentSettings(new Dictionary<string, string>(), new Dictionary<string, string>(), environmentVariables);
+            var environmentSettings = new EnvironmentSettings(appSettings, connectionStrings, environmentVariables);
 
             commandToRun.Invoke(arguments.Switches, environmentSettings);
         }
